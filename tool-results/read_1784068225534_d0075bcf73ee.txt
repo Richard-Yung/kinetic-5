@@ -1,0 +1,1839 @@
+     1→     1→# ARCHITECTURE & STRUCTURATION CODE — RPG 3D ACTION SCI-FI (UNITY)
+     2→     2→
+     3→     3→> **Projet :** RPG 3D action sci-fantasy dans l'esprit de **Tower of Fantasy**, **Solo Leveling** (anime) et **Wuthering Waves**.
+     4→     4→> **Document de planification technique.** Pense-le comme la feuille de route pour coder un vrai univers persistant 3D, avec ses personnages, ses compétences, son économie, son lore — pas juste un "jeu".
+     5→     5→> **Priorité absolue :** le **système** (gameplay, progression, monde vivant) avant le design. Le design s'itera en correctifs après.
+     6→     6→
+     7→     7→---
+     8→     8→
+     9→     9→## ⚠️ INSTRUCTIONS POUR L'IA QUI CODE CE PROJET
+    10→    10→
+    11→    11→> À lire avant toute ligne de code.
+    12→    12→
+    13→    13→1. **Priorité système > design.** Code d'abord un univers **fonctionnel et complet** (mouvement, combat, IA, progression, économie, quêtes, dialogues, save). Le polish visuel vient après, en correctifs demandés par l'utilisateur.
+    14→    14→2. **Demande les assets visuels à l'utilisateur.** Tu ne peux pas coder/modéliser des personnages, environnements, VFX, voix, musique. **Avant de commencer chaque asset visuel**, demande-le à l'utilisateur via une question claire avec un modèle de prompt à lui fournir (voir section "Assets à demander" plus bas).
+    15→    15→3. **Style visuel NON-NÉGOCIABLE.** Ne fais jamais un visuel "carton" (low-poly undetailed, couleurs plates criardes). Vise **anime 3D cell-shaded avec dynamisme Solo Leveling** (voir section Style Visuel).
+    16→    16→4. **Contrôles tactiles obligatoires.** Le jeu aura des boutons virtuels à l'écran (joystick + 4-6 boutons d'attaque/skill/esquive). Pas seulement clavier/souris.
+    17→    17→5. **Pense univers, pas niveau.** Tout doit être data-driven : personnages, compétences, quêtes, régions, dialogues en JSON/ScriptableObjects. On construit un **monde**, pas une suite de scènes.
+    18→    18→
+    19→    19→---
+    20→    20→
+    21→    21→## 📑 INDEX RAPIDE (tout ce qu'on utilisera)
+    22→    22→
+    23→    23→### Technologies
+    24→    24→| Catégorie | Choix | Raison |
+    25→    25→|---|---|---|
+    26→    26→| **Moteur** | **Unity 2023 LTS (6000.0.x LTS)** | Standard industrie, IL2CPP, export mobile/desktop/console, ToF lui-même est Unity |
+    27→    27→| **Langage** | **C# 12 (.NET 8 SDK via Unity)** | Performance, typage strict, écosystème |
+    28→    28→| **Rendering** | **URP (Universal Render Pipeline)** + Shader Graph | Cell-shading, post-processing, perf mobile |
+    29→    29→| **Animation** | **Animator Controller + Playables + Animancer** (option) | State machines + programme runtime |
+    30→    30→| **Netcode** | **Netcode for GameObjects** (small scale) ou **FishNet** (MMO) + **Nakama** (backend) | Autorité serveur, matchmaking, chat |
+    31→    31→| **Backend** | **Nakama (Go, open source)** | Auth, parties, leaderboard, chat, matchmaking — built-in |
+    32→    32→| **DB** | **PostgreSQL** (via Nakama) + **Redis** (cache temps réel) | Persistance + sessions |
+    33→    33→| **UI in-game** | **UI Toolkit** (UI moderne) + **UGUI** (HUD complexe) | UI Toolkit pour menus, UGUI pour HUD |
+    34→    34→| **Touch controls** | **Custom joystick + buttons** (assets Rewired ou Unity Input System) | Joystick virtuel + 4-6 boutons |
+    35→    35→| **Audio** | **FMOD** (adaptatif) ou **Wwise** | BGM dynamique par combat, SFX spatialisés |
+    36→    36→| **Asset pipeline** | **Addressables** + **Scriptable Build Pipeline** | Streaming, DLC, hot updates |
+    37→    37→| **Data-driven** | **ScriptableObjects** + **JSON** + **Odin Inspector** | Tout le contenu en data éditable |
+    38→    38→| **CI/CD** | **GitHub Actions** + **Unity Cloud Build** | Build auto par commit |
+    39→    39→| **Telemetry** | **Unity Analytics** + **PostHog** + **Grafana** | Balance, perf, funnel |
+    40→    40→| **Anti-cheat** | **BattlEye-style custom** + **validation serveur** | MMO = cheat obligatoire |
+    41→    41→| **Versioning assets** | **Git LFS** + **Plastic SCM** (option) | Gros binaires |
+    42→    42→
+    43→    43→### Librairies / packages Unity (à importer)
+    44→    44→- **DOTween** — animations code (tweens)
+    45→    45→- **Odin Inspector** — éditeur ScriptableObjects
+    46→    46→- **Rewired / Unity Input System** — multi-device input
+    47→    47→- **Universal Joystick Controller** ou **Touch Controls Kit** — joystick mobile
+    48→    48→- **Ink** (inkle) — dialogues narratifs
+    49→    49→- **UniTask** — async/await zero-alloc
+    50→    50→- **UniRx** — reactive programming (events, input)
+    51→    51→- **Zenject / VContainer** — dependency injection
+    52→    52→- **Mirror / FishNet** — netcode (selon échelle)
+    53→    53→- **FMOD Unity Integration** — audio adaptatif
+    54→    54→- **Shader Graph** + **Post Processing v3** — cell-shading + bloom
+    55→    55→
+    56→    56→### Patterns d'architecture
+    57→    57→- **ECS DOTS** (Entities 1.0) — pour les entités massives (ennemis, particules)
+    58→    58→- **MVC / MVP** — séparation data / vue / contrôle
+    59→    59→- **Event-driven** — bus d'événements global (combat, loot, quêtes)
+    60→    60→- **State machines** — IA, animation, UI flow
+    61→    61→- **ScriptableObject architecture** — tout le contenu en data
+    62→    62→- **Repository pattern** — accès DB isolé
+    63→    63→- **Authoritative server** — jamais confiance au client
+    64→    64→- **Snapshot interpolation** — netcode MMO
+    65→    65→
+    66→    66→### Références de style visuel (à imiter)
+    67→    67→- **Solo Leveling** (anime) : mouvements dynamiques, ombres violet/noir, slow-mo, hitstop, screen shake, slash trails
+    68→    68→- **Tower of Fantasy** : UI holographique, cell-shading anime, VFX élémentaux
+    69→    69→- **Wuthering Waves** : combat fluide, parades, contre-attaques
+    70→    70→- **Genshin Impact** : open-world coloré, personnages charismatiques
+    71→    71→- **Honkai Star Rail** : qualité visuelle 3D anime, post-processing
+    72→    72→
+    73→    73→---
+    74→    74→
+    75→    75→## 🎨 STYLE VISUEL — NON-NÉGOCIABLE
+    76→    76→
+    77→    77→### ❌ Ce qu'il ne faut PAS faire (référence : "game type 1.webp")
+    78→    78→
+    79→    79→> L'utilisateur a explicitement rejeté ce style. À bannir.
+    80→    80→
+    81→    81→- **Visuel "carton"** : low-poly avec textures plates, pas de détails
+    82→    82→- **Couleurs "caillées"** : palette criarde saturée à 100%, sans gradation
+    83→    83→- **Animations raides** : pas de tween, pas d'anticipation, pas de follow-through
+    84→    84→- **VFX simplistes** : juste des sprites qui poppent, pas de particules dynamiques
+    85→    85→- **Lighting plat** : pas de reflets, pas d'ombres douces, pas de bloom
+    86→    86→- **Personnages génériques** : sans charisme, sans expression faciale
+    87→    87→- **Environnements vides** : sans props, sans végétation, sans atmosphère
+    88→    88→
+    89→    89→### ✅ Ce qu'il faut viser (référence : "game type 2.webp" — anime 3D Solo Leveling)
+    90→    90→
+    91→    91→**Philosophie : anime en mouvement, pas jeu vidéo raide.**
+    92→    92→
+    93→    93→#### Rendu cell-shaded
+    94→    94→- **Toon shader** avec ramp shading (3-5 bandes de couleur, pas de gradient lisse)
+    95→    95→- **Outlines** épais et noirs sur personnages (style manga)
+    96→    96→- **Bloom** sélectif sur éléments lumineux (yeux, armes, VFX)
+    97→    97→- **Color grading** : palette saturée mais cohérente (violets, bleus cyan, oranges néon, noirs profonds)
+    98→    98→- **Post-processing** : chromatic aberration légère, vignette, film grain subtil
+    99→    99→- **Anti-aliasing** : MSAA 4x + FXAA pour edges propres
+   100→   100→
+   101→   101→#### Dynamisme Solo Leveling
+   102→   102→- **Hitstop** : freeze 3-8 frames à chaque hit significatif (jusqu'à 0.1s sur un boss kill)
+   103→   103→- **Screen shake** directionnel et dégressif (pas juste un tremblement aléatoire)
+   104→   104→- **Slow-motion** : 0.3x pendant 0.5s sur ultimes, parades, dodge parfaits
+   105→   105→- **Slash trails** : trails colorés sur armes pendant les attaques
+   106→   106→- **Particle bursts** : explosions de particules élémentaires à chaque hit
+   107→   107→- **Camera kick** : la caméra recule légèrement à l'impact
+   108→   108→- **Camera zoom** : zoom dynamique sur les criticaux / finishes
+   109→   109→- **Motion blur** : sur mouvements rapides et attaques
+   110→   110→- **Frame freeze** : 1 frame blanche à l'impact (flash hit)
+   111→   111→- **Aerial combos** : les ennemis sont liftés en l'air, juggle possible
+   112→   112→- **Dramatic angles** : caméra qui tourne autour sur les ultras
+   113→   113→
+   114→   114→#### Animation
+   115→   115→- **Animation rigs** : Humanoid rig avec IK pour pieds/mains
+   116→   116→- **Animator** : blend trees pour mouvement (idle/walk/run/jump)
+   117→   117→- **Animation events** : déclencheurs VFX/SFX précis sur frames
+   118→   118→- **Anticipation** : 3-5 frames de wind-up avant chaque attaque
+   119→   119→- **Follow-through** : 5-10 frames de recovery après chaque attaque
+   120→   120→- **Squash & stretch** : sur impacts et sauts
+   121→   121→- **Facial expressions** : blend shapes pour émotions (joie, colère, surprise, douleur)
+   122→   122→- **Lip sync** : synchro bouche sur voix (Oculus LipSync ou custom)
+   123→   123→
+   124→   124→#### Palette de couleurs (à coder dans `ThemeManager.cs`)
+   125→   125→```csharp
+   126→   126→public static class ToFAnimePalette {
+   127→   127→    // Backgrounds
+   128→   128→    public static readonly Color Void = new("#020207");
+   129→   129→    public static readonly Color DeepSpace = new("#05060f");
+   130→   130→    public static readonly Color PanelDark = new("#0c0a2e");
+   131→   131→    // Primaries
+   132→   132→    public static readonly Color Cyan = new("#22d3ee");
+   133→   133→    public static readonly Color CyanGlow = new("#67e8f9");
+   134→   134→    public static readonly Color Purple = new("#a855f7");
+   135→   135→    public static readonly Color PurpleDeep = new("#6d28d9");
+   136→   136→    // Elementals
+   137→   137→    public static readonly Color Flame = new("#f97316");
+   138→   138→    public static readonly Color Ice = new("#60a5fa");
+   139→   139→    public static readonly Color Volt = new("#facc15");
+   140→   140→    public static readonly Color Physical = new("#94a3b8");
+   141→   141→    public static readonly Color Altered = new("#a855f7");
+   142→   142→    public static readonly Color Shadow = new("#1e1b4b");  // Solo Leveling
+   143→   143→    // Status
+   144→   144→    public static readonly Color Hp = new("#22c55e");
+   145→   145→    public static readonly Color HpLow = new("#ef4444");
+   146→   146→    public static readonly Color Shield = new("#38bdf8");
+   147→   147→    public static readonly Color Xp = new("#a855f7");
+   148→   148→    // Accent
+   149→   149→    public static readonly Color Gold = new("#fbbf24");
+   150→   150→    public static readonly Color Warning = new("#f97316");
+   151→   151→    public static readonly Color Danger = new("#dc2626");
+   152→   152→}
+   153→   153→```
+   154→   154→
+   155→   155→#### Typos
+   156→   156→- **Titres** : Orbitron (700/900) — néon futuriste
+   157→   157→- **Sous-titres** : Rajdhani (500/600) — angulaire sci-fi
+   158→   158→- **Corps** : Inter (400/500/600)
+   159→   159→- **Données/chiffres** : JetBrains Mono (tabular)
+   160→   160→- **Dialogues** : Noto Sans JP (si voice acting JP)
+   161→   161→
+   162→   162→---
+   163→   163→
+   164→   164→## 🎮 ÉTUDE DE TOWER OF FANTASY + SOLO LEVELING — SYSTÈMES À RÉPLIQUER
+   165→   165→
+   166→   166→### 1. Système de combat (CRITIQUE — le cœur du jeu)
+   167→   167→- **3 armes équipées simultanément** (slot 1/2/3), switch en combat = combo
+   168→   168→- **Discharge skill** : jauge de charge 0→1000, libère compétence ultime quand pleine
+   169→   169→- **Compétence d'arme** : cooldown court (8-15s)
+   170→   170→- **Attaque normale** : combo auto enchaîné (5-7 hits)
+   171→   171→- **Charged attack** : maintien 1.5s = attaque lourde
+   172→   172→- **Éléments** : Flame / Ice / Volt / Physical / Altered / **Shadow** (Solo Leveling)
+   173→   173→- **Résonance élémentaire** : 2 armes même élément → buff (+25% ATK élément, etc.)
+   174→   174→- **Résonance d'arme** : 3 armes même type (Tank/DPS/Support/Benediction) → bonus
+   175→   175→- **Esquive** : dash avec i-frames, slow-mo si timing parfait (parade)
+   176→   176→- **Parade** : blocage juste avant impact = stagger ennemi + contre-attaque
+   177→   177→- **Aerial combo** : lift + juggle (style Solo Leveling)
+   178→   178→- **Ultimate** : cinématique courte + gros burst damage (0.5s slow-mo)
+   179→   179→- **Hitstop + screenshake + VFX** à chaque impact (signature anime)
+   180→   180→
+   181→   181→### 2. Simulacra (personnages jouables)
+   182→   182→- Chaque Simulacrum = skin 3D + arme unique + 2 talents (awakening) + voix
+   183→   183→- **Gacha SSR/SR/R/N** — taux 0.75% / 7% / 70% / 22.25%
+   184→   184→- **Pity system** : 80 pulls garanti SSR, hard pity 120
+   185→   185→- **Duplicates** → fragments d'âme → upgrade talents
+   186→   186→- **Awakening** : arbre de talents à débloquer (50+ nodes par perso)
+   187→   187→- **Bond system** : affection 1-10, dialogues, skins alt
+   188→   188→- **Switch simulacra actif** en combat (change arme + apparence)
+   189→   189→
+   190→   190→### 3. Équipement & progression
+   191→   191→- **Armor** : 7 slots (Head/Hands/Feet/Chest/Legs/Shoulders/Belt) — 4 raretés N/R/SR/SSR
+   192→   192→- **Matrices** (chips) : 4 pièces par set, set bonus 2/4 pièces
+   193→   193→- **Reliques** : objets activables (jetpack, bouclier, hologramme)
+   194→   194→- **Shards de reliques** : farm pour up
+   195→   195→- **Enhancement** : +0 → +30 avec matériaux
+   196→   196→- **Advancement** : fusion de dupes pour monter étoiles (1→6★)
+   197→   197→- **Gear score** : somme de tous les niveaux = power level
+   198→   198→- **Skill tree** par simulacrum (50+ nodes)
+   199→   199→- **Mastery** : niveaux par élément (Flame Mastery, Ice Mastery, etc.)
+   200→   200→
+   201→   201→### 4. Open world & exploration
+   202→   202→- **Régions** : Astra, Banges, Navia, Crown, Warren, Artificial Island, Miasmic Swamp… (6-10 régions)
+   203→   203→- **Streaming** : additive scene loading par chunks (Addressables)
+   204→   204→- **Points d'intérêt** : Spatial rifts, supply pods, scenic points, mushrooms puzzles
+   205→   205→- **Énigmes environnementales** : activateurs, orbes, surcharges
+   206→   206→- **Mounts** : véhicules (motorcycle, mecha, hoverboard) — craft + skins
+   207→   207→- **World bosses** : respawn timer, loot partagé multi-joueurs
+   208→   208→- **Dungeons instanciés** : raids 4-8 joueurs, world bosses 30 joueurs
+   209→   209→- **Weather** : pluie, tempête, day/night cycle, éclairs
+   210→   210→- **Verticalité** : saut, vol (jetpack), escalade
+   211→   211→
+   212→   212→### 5. Multiplayer & social
+   213→   213→- **Serveurs partagés** : 1 monde persistant pour N joueurs simultanés
+   214→   214→- **Groupes** : 4 joueurs PvE, raid 8
+   215→   215→- **Crews** (guilds) : jusqu'à 120 membres, events hebdo, crew battle
+   216→   216→- **World chat / privé / crew** + voice chat (option)
+   217→   217→- **Trading post** : économie régulée, taxe 5%
+   218→   218→- **PvP** : arena 1v1, 3v3, battleground 6v6, open-world PvP flag
+   219→   219→- **Spectator mode** : pour esports
+   220→   220→
+   221→   221→### 6. Monétisation (à transposer éthiquement)
+   222→   222→- **Premium currency** : Tanium (payante) + Dark Crystals (farmable)
+   223→   223→- **Gacha** : Gold Nucleus / Red Nucleus / Proof of Purchase
+   224→   224→- **Battle Pass** : 50 niveaux hebdo
+   225→   225→- **Cosmetics** : skins simulacra, mounts, chat bubbles, nameplates
+   226→   226→- **Cash shop** : bundles, monthly card, growth fund
+   227→   227→- **Limites éthiques** : plafond mensuel, taux affichés, pity counter visible
+   228→   228→
+   229→   229→### 7. Quêtes & narrative
+   230→   230→- **Main quest** (MSQ) — gating par region, 5 acts
+   231→   231→- **Side quests** — lore et mats
+   232→   232→- **Daily quests** — 5/jour, reset 04:00
+   233→   233→- **Weekly quests** — crew + perso
+   234→   234→- **Hidden quests** — exploration triggered
+   235→   235→- **Events limités** — crossover collabs
+   236→   236→- **Dialogue system** (Ink) avec choices, branches, conditions
+   237→   237→- **Cutscenes** : Timeline + Cinemachine
+   238→   238→- **Voice acting** : FR/EN/JP/CN/KR
+   239→   239→
+   240→   240→### 8. HUD/UI (signature ToF + Solo Leveling)
+   241→   241→- **Top-left** : portrait simulacra + barres HP/charge + buffs
+   242→   242→- **Top-right** : minimap + objective tracker
+   243→   243→- **Bottom-center** : 3 slots d'armes avec cooldowns + icon skill + ultimate
+   244→   244→- **Bottom-right** : inventory quick access + mount button
+   245→   245→- **Floating damage numbers** colorés par élément + crit (style Solo Leveling : gros chiffres, pop animations)
+   246→   246→- **Combat VFX overlay** : slash trails, elemental bursts, hitstop flash
+   247→   247→- **On-screen touch controls** (mobile) : joystick gauche + 6 boutons droite
+   248→   248→- **Menus modaux** : Inventory, Simulacra, Crew, Mail, Shop — tous glassmorphism + glitch
+   249→   249→
+   250→   250→---
+   251→   251→
+   252→   252→## 📱 CONTRÔLES TACTILES À L'ÉCRAN (OBLIGATOIRES)
+   253→   253→
+   254→   254→### Layout mobile (paysage)
+   255→   255→```
+   256→   256→┌──────────────────────────────────────────────────┐
+   257→   257→│  [Portrait]              [Minimap]   [Settings]  │
+   258→   258→│  HP ████░░░░                                      │
+   259→   259→│  Charge ████████                                  │
+   260→   260→│  Buffs [icons]                                    │
+   261→   261→│                                                   │
+   262→   262→│                                                   │
+   263→   263→│                  [3D WORLD]                       │
+   264→   264→│                                                   │
+   265→   265→│                                                   │
+   266→   266→│                                                   │
+   267→   267→│  ┌──────┐                          [⚡] [🎯]    │
+   268→   268→│  │      │                          Skill  Ult   │
+   269→   269→│  │  ◉   │  Joystick                [⚔️] [🛡️]    │
+   270→   270→│  │      │  mouvement               Atk   Dodge  │
+   271→   271→│  └──────┘                          [🔄] [🎒]    │
+   272→   272→│                                     Swap  Inv   │
+   273→   273→└──────────────────────────────────────────────────┘
+   274→   274→```
+   275→   275→
+   276→   276→### Spécifications techniques
+   277→   277→- **Joystick gauche** : flottant ( Dynamic Joystick), 0-1 magnitude, snap-back au release
+   278→   278→- **6 boutons droits** :
+   279→   279→  1. **Attaque normale** (carré) — combo auto
+   280→   280→  2. **Skill d'arme** (triangle) — cooldown 8-15s
+   281→   281→  3. **Discharge / Ultimate** (rond, glow quand jauge pleine) — ultime
+   282→   282→  4. **Esquive / Dash** (croix) — i-frames
+   283→   283→  5. **Swap arme** (L1/R1 style) — switch slot 1↔2↔3
+   284→   284→  6. **Inventaire quick access** (carré long press) — radial menu
+   285→   285→- **Boutons supplémentaires contextuels** :
+   286→   286→  - **Interagir** (triangle quand près d'un PNJ/objet)
+   287→   287→  - **Monter véhicule** (quand près d'un mount)
+   288→   288→  - **Sauter** (en mode exploration)
+   289→   289→- **Gestes tactiles** :
+   290→   290→  - **Swipe gauche/droite** : switch arme rapide
+   291→   291→  - **Swipe haut** : saut
+   292→   292→  - **Swipe bas** : ramasser
+   293→   293→  - **Long press** : visée libre (sniper)
+   294→   294→- **Haptic feedback** : vibration courte sur hit, longue sur ultime
+   295→   295→- **Taille des boutons** : 80-100px (44px min Apple, 48px min Google)
+   296→   296→- **Opacité** : 70% au repos, 100% au press
+   297→   297→- **Réglages** : taille, opacité, position (gaucher/droitier), sensibilité joystick
+   298→   298→
+   299→   299→### Contrôles desktop (clavier/souris)
+   300→   300→- **ZQSD/WASD** : déplacement
+   301→   301→- **Souris** : rotation caméra
+   302→   302→- **Clic gauche** : attaque normale
+   303→   303→- **Clic droit** : visée
+   304→   304→- **Espace** : saut / dash
+   305→   305→- **A/1, Z/2, E/3** : switch arme 1/2/3
+   306→   306→- **Shift gauche** : skill d'arme
+   307→   307→- **R** : ultimate (quand jauge pleine)
+   308→   308→- **F** : interagir
+   309→   309→- **Tab** : inventaire
+   310→   310→- **Échap** : pause
+   311→   311→
+   312→   312→### Contrôles manette (Xbox/PS5)
+   313→   313→- **Stick gauche** : déplacement
+   314→   314→- **Stick droit** : caméra
+   315→   315→- **A/Croix** : saut
+   316→   316→- **B/Cercle** : dash
+   317→   317→- **X/Carré** : attaque
+   318→   318→- **Y/Triangle** : skill
+   319→   319→- **LB/L1** : swap arme gauche
+   320→   320→- **RB/R1** : swap arme droite
+   321→   321→- **LT/L2** : visée
+   322→   322→- **RT/R2** : ultimate
+   323→   323→- **Start** : pause
+   324→   324→
+   325→   325→---
+   326→   326→
+   327→   327→## 🏗️ ARCHITECTURE CODE COMPLÈTE — STRUCTURE DES FICHIERS
+   328→   328→
+   329→   329→```
+   330→   330→project-root/
+   331→   331→├── Assets/
+   332→   332→│   ├── _Project/
+   333→   333→│   │   ├── Core/                           # systèmes fondamentaux
+   334→   334→│   │   │   ├── GameManager.cs              # singleton root
+   335→   335→│   │   │   ├── EventBus.cs                 # pub/sub global
+   336→   336→│   │   │   ├── SaveSystem.cs               # JSON + PlayerPrefs + cloud
+   337→   337→│   │   │   ├── SceneLoader.cs              # additive loading
+   338→   338→│   │   │   ├── ObjectPooler.cs             # pools pour VFX/projectiles
+   339→   339→│   │   │   ├── AudioManager.cs             # FMOD wrapper
+   340→   340→│   │   │   ├── LocalizationManager.cs      # i18n
+   341→   341→│   │   │   ├── InputManager.cs             # multi-device
+   342→   342→│   │   │   ├── CameraManager.cs            # Cinemachine wrapper
+   343→   343→│   │   │   ├── TimeManager.cs              # slow-mo, hitstop
+   344→   344→│   │   │   └── TelemetryLogger.cs          # analytics
+   345→   345→│   │   │
+   346→   346→│   │   ├── Gameplay/
+   347→   347→│   │   │   ├── Player/
+   348→   348→│   │   │   │   ├── PlayerController.cs     # mouvement, jump, dash
+   349→   349→│   │   │   │   ├── PlayerCombat.cs         # attaques, combos
+   350→   350→│   │   │   │   ├── PlayerWeaponManager.cs  # 3 slots + switch
+   351→   351→│   │   │   │   ├── PlayerStats.cs          # stats calculées
+   352→   352→│   │   │   │   ├── PlayerAnimator.cs       # animator wrapper
+   353→   353→│   │   │   │   ├── PlayerInventory.cs      # équipement
+   354→   354→│   │   │   │   └── PlayerHUD.cs            # overlay HUD
+   355→   355→│   │   │   │
+   356→   356→│   │   │   ├── Combat/
+   357→   357→│   │   │   │   ├── DamageCalculator.cs     # formules dégâts
+   358→   358→│   │   │   │   ├── ElementalResolver.cs    # éléments, résistances
+   359→   359→│   │   │   │   ├── DischargeSystem.cs      # jauge 1000
+   360→   360→│   │   │   │   ├── ComboChain.cs           # enchaînements
+   361→   361→│   │   │   │   ├── ResonanceCalc.cs        # bonus élément/type
+   362→   362→│   │   │   │   ├── HitstopController.cs    # freeze frames
+   363→   363→│   │   │   │   ├── ScreenShake.cs          # caméra shake
+   364→   364→│   │   │   │   ├── FloatingDamage.cs       # chiffres flottants
+   365→   365→│   │   │   │   └── VFXSpawner.cs           # particules, slash trails
+   366→   366→│   │   │   │
+   367→   367→│   │   │   ├── Enemies/
+   368→   368→│   │   │   │   ├── EnemyController.cs      # base
+   369→   369→│   │   │   │   ├── EnemyAI.cs              # behavior tree
+   370→   370→│   │   │   │   ├── EnemySpawner.cs         # spawn zones
+   371→   371→│   │   │   │   ├── BossController.cs       # boss avec phases
+   372→   372→│   │   │   │   └── BossPhaseManager.cs     # patterns par phase
+   373→   373→│   │   │   │
+   374→   374→│   │   │   ├── NPCs/
+   375→   375→│   │   │   │   ├── NPCController.cs
+   376→   376→│   │   │   │   ├── DialogueTrigger.cs
+   377→   377→│   │   │   │   ├── QuestGiver.cs
+   378→   378→│   │   │   │   ├── Vendor.cs               # marchands
+   379→   379→│   │   │   │   └── Companion.cs            # PNJ qui suivent
+   380→   380→│   │   │   │
+   381→   381→│   │   │   ├── World/
+   382→   382→│   │   │   │   ├── WorldStreamer.cs        # chunks additive
+   383→   383→│   │   │   │   ├── RegionManager.cs
+   384→   384→│   │   │   │   ├── POIManager.cs           # points d'intérêt
+   385→   385→│   │   │   │   ├── WeatherSystem.cs
+   386→   386→│   │   │   │   ├── DayNightCycle.cs
+   387→   387→│   │   │   │   ├── MountSystem.cs          # véhicules
+   388→   388→│   │   │   │   ├── FishingSystem.cs        # mini-jeux
+   389→   389→│   │   │   │   ├── GatheringSystem.cs      # ressources
+   390→   390→│   │   │   │   └── FastTravelSystem.cs
+   391→   391→│   │   │   │
+   392→   392→│   │   │   └── Progression/
+   393→   393→│   │   │       ├── XPManager.cs
+   394→   394→│   │   │       ├── LevelSystem.cs
+   395→   395→│   │   │       ├── SkillTreeManager.cs
+   396→   396→│   │   │       ├── AwakeningManager.cs
+   397→   397→│   │   │       ├── GearScoreCalculator.cs
+   398→   398→│   │   │       └── MasteryManager.cs       # maîtrise par élément
+   399→   399→│   │   │
+   400→   400→│   │   ├── Data/                           # ScriptableObjects (data-driven)
+   401→   401→│   │   │   ├── Simulacra/
+   402→   402→│   │   │   │   ├── SimulacrumData.cs       # scriptableObject schema
+   403→   403→│   │   │   │   ├── Characters/
+   404→   404→│   │   │   │   │   ├── Shiro.asset
+   405→   405→│   │   │   │   │   ├── Nemesis.asset
+   406→   406→│   │   │   │   │   └── ...
+   407→   407→│   │   │   │   └── AwakeningTrees/
+   408→   408→│   │   │   │
+   409→   409→│   │   │   ├── Weapons/
+   410→   410→│   │   │   │   ├── WeaponData.cs
+   411→   411→│   │   │   │   ├── Flame/
+   412→   412→│   │   │   │   │   ├── MeltingSword.asset
+   413→   413→│   │   │   │   │   └── ...
+   414→   414→│   │   │   │   ├── Ice/
+   415→   415→│   │   │   │   ├── Volt/
+   416→   416→│   │   │   │   ├── Physical/
+   417→   417→│   │   │   │   ├── Altered/
+   418→   418→│   │   │   │   └── Shadow/                 # Solo Leveling style
+   419→   419→│   │   │   │
+   420→   420→│   │   │   ├── Enemies/
+   421→   421→│   │   │   │   ├── EnemyData.cs
+   422→   422→│   │   │   │   ├── MobFamily/
+   423→   423→│   │   │   │   └── Bosses/
+   424→   424→│   │   │   │
+   425→   425→│   │   │   ├── Regions/
+   426→   426→│   │   │   │   ├── RegionData.cs
+   427→   427→│   │   │   │   ├── Astra.asset
+   428→   428→│   │   │   │   ├── Banges.asset
+   429→   429→│   │   │   │   └── ...
+   430→   430→│   │   │   │
+   431→   431→│   │   │   ├── Quests/
+   432→   432→│   │   │   │   ├── QuestData.cs
+   433→   433→│   │   │   │   ├── MainQuests/
+   434→   434→│   │   │   │   ├── SideQuests/
+   435→   435→│   │   │   │   ├── DailyQuests/
+   436→   436→│   │   │   │   └── HiddenQuests/
+   437→   437→│   │   │   │
+   438→   438→│   │   │   ├── Items/
+   439→   439→│   │   │   │   ├── ItemData.cs
+   440→   440→│   │   │   │   ├── Consumables/
+   441→   441→│   │   │   │   ├── Materials/
+   442→   442→│   │   │   │   ├── Equipment/
+   443→   443→│   │   │   │   └── Cosmetics/
+   444→   444→│   │   │   │
+   445→   445→│   │   │   ├── Matrices/
+   446→   446→│   │   │   │   ├── MatrixSetData.cs
+   447→   447→│   │   │   │   └── Sets/
+   448→   448→│   │   │   │
+   449→   449→│   │   │   ├── Relics/
+   450→   450→│   │   │   │   └── RelicData.cs
+   451→   451→│   │   │   │
+   452→   452→│   │   │   ├── Skills/
+   453→   453→│   │   │   │   ├── SkillData.cs
+   454→   454→│   │   │   │   ├── NormalAttacks/
+   455→   455→│   │   │   │   ├── WeaponSkills/
+   456→   456→│   │   │   │   └── Discharges/
+   457→   457→│   │   │   │
+   458→   458→│   │   │   ├── LootTables/
+   459→   459→│   │   │   │   └── LootTable.cs
+   460→   460→│   │   │   │
+   461→   461→│   │   │   ├── Economy/
+   462→   462→│   │   │   │   ├── ShopData.cs
+   463→   463→│   │   │   │   ├── GachaRates.asset
+   464→   464→│   │   │   │   └── EnhancementCosts.asset
+   465→   465→│   │   │   │
+   466→   466→│   │   │   ├── Dialogues/
+   467→   467→│   │   │   │   ├── ink/                    # fichiers Ink
+   468→   468→│   │   │   │   │   ├── main_quest_act1.ink
+   469→   469→│   │   │   │   │   └── ...
+   470→   470→│   │   │   │   └── VoiceLines/
+   471→   471→│   │   │   │
+   472→   472→│   │   │   ├── BattlePass/
+   473→   473→│   │   │   │   └── BattlePassSeason.asset
+   474→   474→│   │   │   │
+   475→   475→│   │   │   └── Balance/
+   476→   476→│   │   │       ├── DamageFormula.asset
+   477→   477→│   │   │       └── EconomyConfig.asset
+   478→   478→│   │   │
+   479→   479→│   │   ├── UI/
+   480→   480→│   │   │   ├── HUD/
+   481→   481→│   │   │   │   ├── HUDRoot.cs               # container HUD
+   482→   482→│   │   │   │   ├── HealthBarUI.cs
+   483→   483→│   │   │   │   ├── ChargeBarUI.cs
+   484→   484→│   │   │   │   ├── WeaponSlotsUI.cs
+   485→   485→│   │   │   │   ├── MinimapUI.cs
+   486→   486→│   │   │   │   ├── ObjectiveTrackerUI.cs
+   487→   487→│   │   │   │   ├── FloatingDamageUI.cs
+   488→   488→│   │   │   │   ├── BuffBarUI.cs
+   489→   489→│   │   │   │   ├── BossHealthUI.cs
+   490→   490→│   │   │   │   └── ComboCounterUI.cs
+   491→   491→│   │   │   │
+   492→   492→│   │   │   ├── Menus/
+   493→   493→│   │   │   │   ├── MainMenuUI.cs
+   494→   494→│   │   │   │   ├── InventoryUI.cs
+   495→   495→│   │   │   │   ├── SimulacraListUI.cs
+   496→   496→│   │   │   │   ├── GachaScreenUI.cs
+   497→   497→│   │   │   │   ├── ShopUI.cs
+   498→   498→│   │   │   │   ├── CrewPanelUI.cs
+   499→   499→│   │   │   │   ├── QuestLogUI.cs
+   500→   500→│   │   │   │   ├── MailBoxUI.cs
+   501→   501→│   │   │   │   ├── SettingsUI.cs
+   502→   502→│   │   │   │   ├── CharacterSheetUI.cs
+   503→   503→│   │   │   │   ├── SkillTreeUI.cs
+   504→   504→│   │   │   │   ├── DialogueUI.cs
+   505→   505→│   │   │   │   └── PauseMenuUI.cs
+   506→   506→│   │   │   │
+   507→   507→│   │   │   ├── TouchControls/              # mobile
+   508→   508→│   │   │   │   ├── TouchJoystick.cs        # joystick flottant
+   509→   509→│   │   │   │   ├── TouchButton.cs          # bouton multi-tap
+   510→   510→│   │   │   │   ├── TouchInputBinder.cs     # bind actions → boutons
+   511→   511→│   │   │   │   ├── TouchGestureDetector.cs # swipes, long press
+   512→   512→│   │   │   │   ├── HapticFeedback.cs       # vibration
+   513→   513→│   │   │   │   └── TouchControlsCanvas.prefab
+   514→   514→│   │   │   │
+   515→   515→│   │   │   └── Components/
+   516→   516→│   │   │       ├── HoloPanel.cs
+   517→   517→│   │   │       ├── GlitchButton.cs
+   518→   518→│   │   │       ├── RarityBadge.cs
+   519→   519→│   │   │       ├── ElementIcon.cs
+   520→   520→│   │   │       ├── CurrencyDisplay.cs
+   521→   521→│   │   │       ├── LoadingBar.cs
+   522→   522→│   │   │       └── Toast.cs
+   523→   523→│   │   │
+   524→   524→│   │   ├── Network/
+   525→   525→│   │   │   ├── NetworkClient.cs            # socket client
+   526→   526→│   │   │   ├── PacketHandlers.cs
+   527→   527→│   │   │   ├── LagCompensation.cs
+   528→   528→│   │   │   ├── NetworkedTransform.cs       # sync position/rotation
+   529→   529→│   │   │   ├── NetworkAnimator.cs
+   530→   530→│   │   │   └── InterestManagement.cs       # culling distant entities
+   531→   531→│   │   │
+   532→   532→│   │   ├── Render/
+   533→   533→│   │   │   ├── Shaders/
+   534→   534→│   │   │   │   ├── Toon.shader             # cell-shading
+   535→   535→│   │   │   │   ├── ToonOutline.shader
+   536→   536→│   │   │   │   ├── Hologram.shader
+   537→   537→│   │   │   │   ├── Glitch.shader
+   538→   538→│   │   │   │   └── ElementalVFX.shader
+   539→   539→│   │   │   ├── PostProcessing/
+   540→   540→│   │   │   │   ├── BloomSelective.cs
+   541→   541→│   │   │   │   ├── ChromaticAberration.cs
+   542→   542→│   │   │   │   └── HitstopFlash.cs
+   543→   543→│   │   │   └── VFX/
+   544→   544→│   │   │       ├── SlashTrail.cs
+   545→   545→│   │   │       ├── ElementalBurst.cs
+   546→   546→│   │   │       └── HitParticles.cs
+   547→   547→│   │   │
+   548→   548→│   │   ├── Audio/
+   549→   549→│   │   │   ├── MusicPlayer.cs              # BGM adaptatif
+   550→   550→│   │   │   ├── SfxBank.cs
+   551→   551→│   │   │   ├── VoiceLinePlayer.cs
+   552→   552→│   │   │   └── AudioMixerController.cs
+   553→   553→│   │   │
+   554→   554→│   │   ├── Localization/
+   555→   555→│   │   │   ├── fr.json
+   556→   556→│   │   │   ├── en.json
+   557→   557→│   │   │   ├── jp.json
+   558→   558→│   │   │   ├── cn.json
+   559→   559→│   │   │   └── kr.json
+   560→   560→│   │   │
+   561→   561→│   │   └── Tests/
+   562→   562→│   │       ├── EditMode/
+   563→   563→│   │       │   ├── DamageCalculatorTests.cs
+   564→   564→│   │       │   ├── GachaServiceTests.cs
+   565→   565→│   │       │   └── ...
+   566→   566→│   │       └── PlayMode/
+   567→   567→│   │           ├── PlayerControllerTests.cs
+   568→   568→│   │           └── ...
+   569→   569→│   │
+   570→   570→│   ├── Plugins/                            # third-party
+   571→   571→│   │   ├── FMOD/
+   572→   572→│   │   ├── Odin/
+   573→   573→│   │   ├── DOTween/
+   574→   574→│   │   └── ...
+   575→   575→│   │
+   576→   576→│   ├── Settings/
+   577→   577→│   │   ├── URP/                            # render pipeline assets
+   578→   578→│   │   ├── InputActions.inputactions       # Unity Input System
+   579→   579→│   │   └── ProjectSettings/
+   580→   580→│   │
+   581→   581→│   └── AddressableAssetsData/              # Addressables config
+   582→   582→│
+   583→   583→├── server/                                 # backend Nakama
+   584→   584→│   ├── main.go                             # bootstrap
+   585→   585→│   ├── modules/
+   586→   586→│   │   ├── auth.go
+   587→   587→│   │   ├── inventory.go
+   588→   588→│   │   ├── gacha.go
+   589→   589→│   │   ├── matchmaker.go
+   590→   590→│   │   ├── leaderboard.go
+   591→   591→│   │   ├── chat.go
+   592→   592→│   │   └── trade.go
+   593→   593→│   ├── lua/                                # scripts serveur Nakama
+   594→   594→│   │   ├── combat_validate.lua
+   595→   595→│   │   └── economy.lua
+   596→   596→│   └── docker-compose.yml
+   597→   597→│
+   598→   598→├── tools/
+   599→   599→│   ├── data-validator/                     # valide .asset vs schemas
+   600→   600→│   ├── balance-simulator/                  # simu combat
+   601→   601→│   ├── map-editor/                         # éditeur régions
+   602→   602→│   └── asset-importer/                     # batch import FBX
+   603→   603→│
+   604→   604→├── docs/
+   605→   605→│   ├── GDD.md                              # Game Design Document
+   606→   606→│   ├── CombatSystem.md
+   607→   607→│   ├── GachaSpec.md
+   608→   608→│   ├── NetworkProtocol.md
+   609→   609→│   ├── DataSchemas.md
+   610→   610→│   ├── AntiCheat.md
+   611→   611→│   ├── StyleGuide.md                       # références visuelles
+   612→   612→│   ├── TouchControls.md
+   613→   613→│   └── adr/                                # Architecture Decision Records
+   614→   614→│       ├── 0001-scriptableobject-pattern.md
+   615→   615→│       ├── 0002-authoritative-server.md
+   616→   616→│       └── ...
+   617→   617→│
+   618→   618→├── .github/workflows/
+   619→   619→│   ├── ci.yml                              # lint+test+build
+   620→   620→│   └── deploy.yml
+   621→   621→│
+   622→   622→└── README.md
+   623→   623→```
+   624→   624→
+   625→   625→---
+   626→   626→
+   627→   627→## 📋 ÉTAPES DE CODAGE — PLAN COMPLET EN 16 PHASES
+   628→   628→
+   629→   629→> Chaque phase doit être **validée** (lint + tests + review utilisateur) avant de passer à la suivante. Le système prime sur le design — on construit d'abord un univers fonctionnel, puis on itère le visuel.
+   630→   630→
+   631→   631→### PHASE 0 — Pré-production (2-4 semaines)
+   632→   632→
+   633→   633→| Tâche | Détails |
+   634→   634→|---|---|
+   635→   635→| 0.1 Game Design Document | Document de 50+ pages : vision, pillars, target audience, monétisation éthique |
+   636→   636→| 0.2 Style guide visuel | Palette ToF + Solo Leveling, typos, ref artistique, moodboards par région |
+   637→   637→| 0.3 Story bible | Lore, factions, personnages, dialogues-clés, 5 acts |
+   638→   638→| 0.4 **Demande assets visuels à l'utilisateur** | Voir section "Assets à demander" ci-dessous |
+   639→   639→| 0.5 Wireframes UI | Tous les écrans (login, hub, HUD, menus) en Figma |
+   640→   640→| 0.6 Prototype graybox | 1 zone test, 1 personnage, 1 ennemi, 1 arme — prouve le game feel |
+   641→   641→| 0.7 Validation technique | Build mobile + desktop OK, 60 FPS atteint |
+   642→   642→
+   643→   643→### PHASE 1 — Socle Unity (1-2 semaines)
+   644→   644→
+   645→   645→1. Créer projet Unity 6000.0 LTS avec URP
+   646→   646→2. Configurer Git LFS pour gros binaires (.fbx, .png, .wav)
+   647→   647→3. Installer packages : Input System, Cinemachine, Addressables, TextMeshPro, Odin, DOTween, UniTask
+   648→   648→4. Setup dossiers `_Project/` (Core, Gameplay, Data, UI, Network, Render, Audio)
+   649→   649→5. **GameManager.cs** singleton + EventBus + ObjectPooler
+   650→   650→6. **InputManager.cs** avec Input System (KB/mouse + manette + touch)
+   651→   651→7. **SaveSystem.cs** JSON + PlayerPrefs
+   652→   652→8. CI GitHub Actions : build auto sur chaque PR
+   653→   653→9. **Validation** : build PC + Android + WebGL sans erreur
+   654→   654→
+   655→   655→### PHASE 2 — Authentification & compte (1 semaine)
+   656→   656→
+   657→   657→1. Backend **Nakama** en Docker local
+   658→   658→2. Inscription email/mot de passe + JWT
+   659→   659→3. OAuth2 Google / Apple
+   660→   660→4. Schémas DB : `User`, `PlayerProfile`, `Session`
+   661→   661→5. UI Login React ou Unity UI Toolkit
+   662→   662→6. Validation serveur stricte (schema Zod-like en Go)
+   663→   663→7. **Validation** : login + register + session persistante
+   664→   664→
+   665→   665→### PHASE 3 — Mouvement & caméra (1-2 semaines)
+   666→   666→
+   667→   667→**Objectif :** Personnage qui court, saute, dash, grimpe dans une scène graybox.
+   668→   668→
+   669→   669→1. **PlayerController.cs** — CharacterController ou Rigidbody
+   670→   670→2. **CameraManager.cs** — Cinemachine virtual camera (3rd person)
+   671→   671→3. Animations de mouvement (idle/walk/run/jump/fall) — *demander à l'utilisateur*
+   672→   672→4. **InputManager** — bind ZQSD + souris + touch joystick
+   673→   673→5. **Dash** avec i-frames + slow-mo sur perfect dodge
+   674→   674→6. **Saut** + double saut + wall jump
+   675→   675→7. **Grimpe** + ledge grab
+   676→   676→8. **Mount system** — base (sans véhicule encore)
+   677→   677→9. **Touch controls** — joystick flottant + bouton saut/dash
+   678→   678→10. **Validation** : 60 FPS stable, controls responsive < 50ms
+   679→   679→
+   680→   680→### PHASE 4 — Combat de base (2-3 semaines)
+   681→   681→
+   682→   682→**Objectif :** Attaquer, prendre des dégâts, tuer 1 ennemi, mourir, respawn.
+   683→   683→
+   684→   684→1. **PlayerCombat.cs** — attaque normale combo 5 hits
+   685→   685→2. **PlayerWeaponManager.cs** — 3 slots + switch animé
+   686→   686→3. **EnemyController.cs** + **EnemyAI.cs** — 1 type ennemi basique
+   687→   687→4. **DamageCalculator.cs** — formule de base (ATK - DEF)
+   688→   688→5. **Health system** — HP, mort, respawn
+   689→   689→6. **HitstopController.cs** — freeze 3-5 frames sur hit
+   690→   690→7. **ScreenShake.cs** — caméra shake directionnel
+   691→   691→8. **FloatingDamage.cs** — chiffres flottants colorés
+   692→   692→9. **VFXSpawner.cs** — slash trails, hit particles
+   693→   693→10. **Drop & pickup** — loot, magnet, inventory
+   694→   694→11. **HUD** — barre HP + compteur score + 3 slots d'armes
+   695→   695→12. **Validation** : combat feel bon, hitstop + shake ressentis
+   696→   696→
+   697→   697→### PHASE 5 — Combat enrichi ToF (3-4 semaines)
+   698→   698→
+   699→   699→**Réplique du système ToF complet.**
+   700→   700→
+   701→   701→1. **5 éléments** : Flame / Ice / Volt / Physical / Altered (+ Shadow en bonus SL)
+   702→   702→2. **ElementalResolver.cs** — résistances, faiblesses, calculs
+   703→   703→3. **WeaponSkill** — cooldown 8-15s par arme
+   704→   704→4. **DischargeSystem** — jauge 0→1000, ultimate skill
+   705→   705→5. **ComboChain** — enchaînements par arme
+   706→   706→6. **ResonanceCalc** :
+   707→   707→   - Élémentaire : 2 armes même élément → +25% ATK élément
+   708→   708→   - Type arme : 3 DPS → +15% crit, 3 Tank → +20% DEF, etc.
+   709→   709→7. **Parade** — blocage timing = stagger + contre
+   710→   710→8. **Aerial combo** — lift + juggle
+   711→   711→9. **Crit system** — taux + multiplicateur + icône
+   712→   712→10. **Buffs/Debuffs** — 50+ types (poison, burn, freeze, stun, ATK up, etc.)
+   713→   713→11. **Status effects** — freeze = slow, burn = DoT, etc.
+   714→   714→12. **VFX élémentaux** — *demander à l'utilisateur* (flame bursts, ice shards, etc.)
+   715→   715→13. **SFX combat** — *demander à l'utilisateur*
+   716→   716→14. **Tests balance** — simu 1000 combats, vérif deltas
+   717→   717→
+   718→   718→### PHASE 6 — Progression & inventaire (3 semaines)
+   719→   719→
+   720→   720→1. ScriptableObject `ItemData`, `WeaponData`, `ArmorData`, `MatrixData`
+   721→   721→2. **PlayerInventory.cs** — 100+ slots, tri, filtre
+   722→   722→3. 7 slots d'armor + 3 slots d'arme + 4 slots de matrice
+   723→   723→4. **Enhancement** — +0 à +30 avec matériaux (data-driven)
+   724→   724→5. **Advancement** — fusion dupes → étoiles 1-6
+   725→   725→6. **Gear score** — power level calculé
+   726→   726→7. **Matrices** — sets 2/4 pièces, set bonus
+   727→   727→8. **Reliques** — 8 slots, activation skill
+   728→   728→9. **UI Inventory** complète (filter, sort, compare, lock, dismantle)
+   729→   729→10. **Loot tables** — JSON par source (mob, boss, chest)
+   730→   730→11. **Anti-cheat** — tout loot server-side, signature cryptographique
+   731→   731→
+   732→   732→### PHASE 7 — Simulacra & gacha (2-3 semaines)
+   733→   733→
+   734→   734→1. ScriptableObject `SimulacrumData` (stats, skills, awakening tree, voice lines, lore)
+   735→   735→2. 10+ simulacra en data — *demander visuels à l'utilisateur*
+   736→   736→3. **GachaService** — RNG seedé (audit), pity 80 / hard pity 120
+   737→   737→4. Taux configurables dans `GachaRates.asset`
+   738→   738→5. **Fragments d'âme** — dupes converties, awakening
+   739→   739→6. UI gacha avec animations (pull card, reveal SSR) — *demander VFX à l'utilisateur*
+   740→   740→7. **Éthique** : taux affichés, limite mensuelle, pity counter visible
+   741→   741→8. UI Simulacra List (tri, filtre, détails, awakening tree)
+   742→   742→9. Switch simulacra actif en combat
+   743→   743→10. **Bond system** — affection 1-10, dialogues spéciaux
+   744→   744→
+   745→   745→### PHASE 8 — Open world & exploration (4-6 semaines)
+   746→   746→
+   747→   747→1. **WorldStreamer.cs** — additive scene loading par chunks (Addressables)
+   748→   748→2. 6 régions ScriptableObjects (Astra, Banges, Navia, Crown, Warren, Artificial Island) — *demander visuels à l'utilisateur*
+   749→   749→3. **POIManager** — scenic points, supply pods, rifts
+   750→   750→4. **Énigmes** — activateurs, orbes, puzzles mushroom
+   751→   751→5. **WeatherSystem** — pluie, tempête, day/night
+   752→   752→6. **DayNightCycle** — 24h game = 2h real
+   753→   753→7. **World bosses** — scheduling, multi-joueur, loot partagé
+   754→   754→8. **Mounts** — 8 véhicules, craft + skins
+   755→   755→9. **Minimap** — zoom, POI, ping crew
+   756→   756→10. **Fast travel** — unlock scenic points
+   757→   757→11. **Hidden quests** — trigger par zone/objet
+   758→   758→12. **Gathering** — ressources (mining, fishing, foraging)
+   759→   759→13. **VFX environnement** — *demander à l'utilisateur*
+   760→   760→
+   761→   761→### PHASE 9 — Netcode MMO (3-4 semaines)
+   762→   762→
+   763→   763→1. **Nakama** backend部署 (Docker, multi-pod)
+   764→   764→2. **NetworkClient.cs** — connexion WebSocket
+   765→   765→3. **NetworkedTransform.cs** — sync position/rotation
+   766→   766→4. **MovementHandler** — client-side prediction + réconciliation serveur
+   767→   767→5. **Snapshot interpolation** — buffer 100ms, lerp positions
+   768→   768→6. **LagCompensation** — rewind hitboxes pour hit detection
+   769→   769→7. **CombatHandler** — validation dégâts server-side
+   770→   770→8. **Interest management** — n'envoyer que les entités proches
+   771→   771→9. **Rate limit** — 20 Hz update positions, 10 Hz autres events
+   772→   772→10. **Reconnect** — état conservé 5 min
+   773→   773→11. Tests charge : 1000 joueurs simulés par région
+   774→   774→
+   775→   775→### PHASE 10 — Quêtes & narrative (2-3 semaines)
+   776→   776→
+   777→   777→1. ScriptableObject `QuestData` (steps, conditions, rewards, dialogue)
+   778→   778→2. **QuestSystem** — tracking, completion events
+   779→   779→3. **Main quest** — 5 acts gating regions — *demander dialogues à l'utilisateur*
+   780→   780→4. **Side quests** — lore + mats
+   781→   781→5. **Daily / weekly quests** — reset job 04:00
+   782→   782→6. **Hidden quests** — exploration triggered
+   783→   783→7. **Dialogue system** avec Ink — typewriter, choices, voice lines
+   784→   784→8. **CutsceneScene** — Timeline + Cinemachine
+   785→   785→9. **Mailbox** — récompenses, messages PNJ, gifts crew
+   786→   786→10. **Voice acting** — *demander à l'utilisateur* (FR/EN/JP)
+   787→   787→
+   788→   788→### PHASE 11 — Multiplayer & social (3-4 semaines)
+   789→   789→
+   790→   790→1. **Crews** (guilds) — création, inviter, ranks, crew bank
+   791→   791→2. **Crew events** — hebdo bosses, battle, rewards
+   792→   792→3. **Groupes PvE** — 4 joueurs, sync instance dungeon
+   793→   793→4. **Raids** — 8 joueurs, instances lockout hebdo
+   794→   794→5. **Trading post** — ventes entre joueurs, taxe 5%
+   795→   795→6. **Chat** — world/crew/private/region, moderation, mute
+   796→   796→7. **Friends list** — status, invite, join session
+   797→   797→8. **PvP Arena** — 1v1, 3v3 matchmaking ELO
+   798→   798→9. **Battleground** — 6v6 capture objectives
+   799→   799→10. **Leaderboards** — Redis sorted sets, reset mensuel
+   800→   800→
+   801→   801→### PHASE 12 — Monétisation éthique (1-2 semaines)
+   802→   802→
+   803→   803→1. Schéma DB : `Currency`, `Transaction`, `Purchase`
+   804→   804→2. **Premium** : Tanium (payante), Dark Crystals (farmable)
+   805→   805→3. **Battle Pass** — 50 niveaux, free + premium track
+   806→   806→4. **Cash shop** — cosmetics uniquement (skins, mounts, chat)
+   807→   807→5. **Monthly card** — 30 jours login rewards
+   808→   808→6. **Stripe / Apple / Google** payment integration
+   809→   809→7. **Limiter** : plafond mensuel d'achat configurable par user
+   810→   810→8. UI shop avec previews 3D
+   811→   811→9. **Anti-fraud** — détection comportements anormaux
+   812→   812→
+   813→   813→### PHASE 13 — Live ops & telemetry (1-2 semaines)
+   814→   814→
+   815→   815→1. **Unity Analytics** + **PostHog** — funnel retention, balance
+   816→   816→2. **Grafana dashboards** — CCU, latency, errors, economy
+   817→   817→3. **Alerting** — Discord webhook si CCU chute ou erreur spike
+   818→   818→4. **A/B testing** — feature flags par user segment
+   819→   819→5. **Events limités** — config JSON, schedule cron
+   820→   820→6. **Crossover collabs** — système de skins invités
+   821→   821→7. **Patch hotfix** — deploy sans downtime (blue/green)
+   822→   822→8. **Backup** — PostgreSQL daily + Redis hourly
+   823→   823→9. **GDPR** — export/delete user data on request
+   824→   824→
+   825→   825→### PHASE 14 — Polish visuel & anime dynamisme (3-4 semaines)
+   826→   826→
+   827→   827→**C'est ici qu'on applique le style Solo Leveling à fond.**
+   828→   828→
+   829→   829→1. **Toon shader** URP — ramp shading 3-5 bandes
+   830→   830→2. **Outlines** — shader outline épais noir
+   831→   831→3. **Post-processing** — bloom sélectif, chromatic aberration, vignette, film grain
+   832→   832→4. **Hitstop tuning** — 3-8 frames selon type de hit
+   833→   833→5. **Screen shake** — directionnel, dégressif, paramétrable
+   834→   834→6. **Slow-motion** — 0.3x sur ultimates, parades, dodge parfaits
+   835→   835→7. **Slash trails** — VFX Graph sur armes
+   836→   836→8. **Particle bursts** — élémentaux, colorés
+   837→   837→9. **Camera kick + zoom** — sur criticaux et finishes
+   838→   838→10. **Motion blur** — sur mouvements rapides
+   839→   839→11. **Frame freeze** — 1 frame blanche à l'impact
+   840→   840→12. **Facial animations** — blend shapes émotions
+   841→   841→13. **Lip sync** — Oculus LipSync ou custom
+   842→   842→14. **VFX cutscenes** — pour ultras et boss kills
+   843→   843→15. **Color grading** — LUT par région (chaude/froide/sombre)
+   844→   844→
+   845→   845→### PHASE 15 — Polish UX & accessibility (2 semaines)
+   846→   846→
+   847→   847→1. **Tutorial** — onboarding interactif 5 min
+   848→   848→2. **Accessibility** :
+   849→   849→   - Colorblind modes (protanopia, deuteranopia, tritanopia)
+   850→   850→   - Subtitles pour voix
+   851→   851→   - Remap keys
+   852→   852→   - Font scaling
+   853→   853→   - Reduce motion (désactive hitstop/shake)
+   854→   854→3. **Localization** — FR/EN/JP/CN/KR avec QA natifs
+   855→   855→4. **Audio adaptatif** — BGM calme/exploration/combat/boss
+   856→   856→5. **Settings** : graphismes (low/med/high/ultra), audio, controls, language
+   857→   857→6. **Bug bash** — 1 semaine avec 50 testeurs
+   858→   858→7. **Stress test** — 10k comptes simulés
+   859→   859→8. **Soft launch** — 1 region (Canada/SEA), itère 2 semaines
+   860→   860→
+   861→   861→### PHASE 16 — Launch & post-launch (continu)
+   862→   862→
+   863→   863→1. **Global launch** — rollback plan + on-call rotation
+   864→   864→2. **Live ops calendar** — events, banners, updates
+   865→   865→3. **Community management** — Discord, Reddit, social
+   866→   866→4. **Balance patches** — basés sur telemetry
+   867→   867→5. **New content** — simulacra, régions, modes, tous les mois
+   868→   868→
+   869→   869→---
+   870→   870→
+   871→   871→## 📋 ASSETS À DEMANDER À L'UTILISATEUR
+   872→   872→
+   873→   873→> L'IA ne peut pas coder ces éléments. **Avant de commencer chaque phase nécessitant ces assets, l'IA DOIT demander à l'utilisateur** via une question claire.
+   874→   874→
+   875→   875→### Modèles 3D (characters, enemies, bosses)
+   876→   876→**L'IA doit demander :**
+   877→   877→> « Pour la phase X, j'ai besoin du modèle 3D de [personnage/ennemi]. Peux-tu me fournir :
+   878→   878→> - Fichier FBX ou Blender (.blend) du modèle riggé Humanoid
+   879→   879→> - Textures (albedo, normal, metallic, emission) en PNG 4K
+   880→   880→> - Palette de couleurs souhaitée (ou référence image)
+   881→   881→> - Si pas de modèle, fournis-moi une **référence visuelle** (image, concept art) et je te dirai quel asset store / artiste contacter. »
+   882→   882→
+   883→   883→**Liste des modèles à demander :**
+   884→   884→- [ ] 10+ personnages jouables (Simulacra) — modèle + textures + rig
+   885→   885→- [ ] 20+ types d'ennemis (mobs + élites)
+   886→   886→- [ ] 5+ boss (avec phases visuelles)
+   887→   887→- [ ] 10+ PNJ (marchands, quest givers, companions)
+   888→   888→- [ ] 8+ véhicules (mounts)
+   889→   889→
+   890→   890→### Environnements 3D
+   891→   891→**L'IA doit demander :**
+   892→   892→> « Pour la région [X], j'ai besoin de :
+   893→   893→> - Tileset/modulaire (murs, sols, props) en FBX
+   894→   894→> - Textures PBR (albedo, normal, roughness, AO)
+   895→   895→> - Skybox (HDRI ou cubemap)
+   896→   896→> - Végétation (arbres, herbes, rochers)
+   897→   897→> - Référence visuelle de l'ambiance souhaitée »
+   898→   898→
+   899→   899→**Liste :**
+   900→   900→- [ ] 6+ régions (Astra, Banges, Navia, Crown, Warren, Artificial Island)
+   901→   901→- [ ] 10+ dungeons (instances)
+   902→   902→- [ ] 5+ cities/hubs
+   903→   903→- [ ] Skyboxes par région et par time-of-day
+   904→   904→
+   905→   905→### Animations
+   906→   906→**L'IA doit demander :**
+   907→   907→> « Pour [personnage], j'ai besoin des animations :
+   908→   908→> - idle, walk, run, jump, fall, land
+   909→   909→> - attack combo 1-5, charged attack, ultimate
+   910→   910→> - dash, dodge, parry, hit reaction, death
+   911→   911→> - Fichiers FBX séparés, rig Humanoid compatible
+   912→   912→> - Si pas d'animation, je peux utiliser Mixamo / Unreal marketplace comme base, à valider avec toi. »
+   913→   913→
+   914→   914→**Liste :**
+   915→   915→- [ ] Animations par simulacrum (20+ animations chacun)
+   916→   916→- [ ] Animations ennemis (10+ par type)
+   917→   917→- [ ] Animations boss (30+ par boss avec phases)
+   918→   918→
+   919→   919→### VFX & particules
+   920→   920→**L'IA doit demander :**
+   921→   921→> « Pour les VFX de combat, j'ai besoin de références visuelles pour :
+   922→   922→> - Slash trails par élément (flame, ice, volt, shadow)
+   923→   923→> - Hit bursts par élément
+   924→   924→> - Ultimate cutscenes (court, 1-2s)
+   925→   925→> - Status effect particles (burn, freeze, poison, stun)
+   926→   926→> - Fournis-moi des GIFs ou vidéos de référence (Solo Leveling, ToF, Genshin) »
+   927→   927→
+   928→   928→### Audio
+   929→   929→**L'IA doit demander :**
+   930→   930→> « Pour l'audio, j'ai besoin de :
+   931→   931→> - BGM par région (3-5 tracks par région, loopables, sans droits)
+   932→   932→> - BGM combat (calme, intensif, boss)
+   933→   933→> - SFX combat (hits, slashes, parries, ultimates, deaths)
+   934→   934→> - SFX UI (clicks, hovers, confirmations)
+   935→   935→> - Voice lines par simulacrum (FR/EN/JP — 50+ lignes par perso)
+   936→   936→> - Fournis-moi des références de style (compositeur, OST existante) »
+   937→   937→
+   938→   938→### UI / 2D art
+   939→   939→**L'IA doit demander :**
+   940→   940→> « Pour l'UI, j'ai besoin de :
+   941→   941→> - Icons d'objets (100+ items, weapons, consumables)
+   942→   942→> - Portraits de simulacra (splash art)
+   943→   943→> - Logos et branding
+   944→   944→> - Frames/borders pour UI (rareté N/R/SR/SSR)
+   945→   945→> - Fournis-moi le style guide visuel ou des références (ToF, Genshin) »
+   946→   946→
+   947→   947→### Dialogues & scénario
+   948→   948→**L'IA doit demander :**
+   949→   949→> « Pour les dialogues, j'ai besoin de :
+   950→   950→> - Script complet de la main quest (5 acts)
+   951→   951→> - Side quests (50+)
+   952→   952→> - Lore bible (factions, histoire, géographie)
+   953→   953→> - Character backstories (10+ simulacra)
+   954→   954→> - Soit tu écris le texte, soit je peux le générer en style générique à valider avec toi. »
+   955→   955→
+   956→   956→### Cosmetics
+   957→   957→**L'IA doit demander :**
+   958→   958→> « Pour les cosmetics, j'ai besoin de :
+   959→   959→> - Skins alternatifs par simulacra (3+ skins par perso)
+   960→   960→> - Mount skins
+   961→   961→> - Chat bubbles, nameplates, emotes
+   962→   962→> - Références visuelles ou assets 3D »
+   963→   963→
+   964→   964→---
+   965→   965→
+   966→   966→## ⚙️ PARAMÈTRES À CODER — INVENTAIRE EXHAUSTIF
+   967→   967→
+   968→   968→### A. Paramètres joueur (PlayerProfile)
+   969→   969→```csharp
+   970→   970→[System.Serializable]
+   971→   971→public class PlayerProfile {
+   972→   972→    public string Id;
+   973→   973→    public string UserId;
+   974→   974→    public string DisplayName;
+   975→   975→    public string AvatarUrl;
+   976→   976→    public int Level;                    // 1-80
+   977→   977→    public long Xp;
+   978→   978→    public long XpToNext;
+   979→   979→    public int PowerLevel;               // gear score calculé
+   980→   980→    public StatsBlock BaseStats;
+   981→   981→    public Currencies Currencies;
+   982→   982→    public List<string> SimulacraUnlocked;
+   983→   983→    public string SimulacraActive;
+   984→   984→    public string[] WeaponsEquipped = new string[3];
+   985→   985→    public Dictionary<ArmorSlot, string> ArmorEquipped = new();
+   986→   986→    public string[] MatricesEquipped = new string[4];
+   987→   987→    public Dictionary<int, string> RelicSet = new();
+   988→   988→    public string CrewId;
+   989→   989→    public DateTime LastLoginAt;
+   990→   990→    public long PlaytimeSeconds;
+   991→   991→    public DateTime CreatedAt;
+   992→   992→}
+   993→   993→
+   994→   994→[System.Serializable]
+   995→   995→public class StatsBlock {
+   996→   996→    public float Hp;
+   997→   997→    public float Attack;
+   998→   998→    public float Defense;
+   999→   999→    public float CritRate;               // 0-1
+  1000→  1000→    public float CritDamage;             // 0-10
+  1001→  1001→    public Dictionary<Element, float> ElementalMastery = new();
+  1002→  1002→    public float MoveSpeed;
+  1003→  1003→    public float DashStamina;
+  1004→  1004→    public float AttackSpeed;
+  1005→  1005→    public float CooldownReduction;
+  1006→  1006→}
+  1007→  1007→
+  1008→  1008→[System.Serializable]
+  1009→  1009→public class Currencies {
+  1010→  1010→    public long DarkCrystals;            // farmable premium
+  1011→  1011→    public long Tanium;                  // paid premium
+  1012→  1012→    public long Gold;
+  1013→  1013→    public long BlackGold;               // crew currency
+  1014→  1014→    public Dictionary<string, long> EventTokens = new();
+  1015→  1015→}
+  1016→  1016→
+  1017→  1017→public enum ArmorSlot { Head, Hands, Feet, Chest, Legs, Shoulders, Belt }
+  1018→  1018→public enum Element { Flame, Ice, Volt, Physical, Altered, Shadow }
+  1019→  1019→public enum WeaponType { Tank, DPS, Support, Benediction }
+  1020→  1020→public enum Rarity { N, R, SR, SSR }
+  1021→  1021→```
+  1022→  1022→
+  1023→  1023→### B. Paramètres Simulacrum
+  1024→  1024→```csharp
+  1025→  1025→[CreateAssetMenu(fileName = "NewSimulacrum", menuName = "Game/Simulacrum")]
+  1026→  1026→public class SimulacrumData : ScriptableObject {
+  1027→  1027→    [Header("Identity")]
+  1028→  1028→    public string Id;
+  1029→  1029→    public string DisplayName;
+  1030→  1030→    public Rarity Rarity;
+  1031→  1031→    public Element Element;
+  1032→  1032→    public WeaponType WeaponType;
+  1033→  1033→    public string WeaponId;
+  1034→  1034→    [TextArea] public string LoreText;
+  1035→  1035→    public Sprite SplashArt;
+  1036→  1036→    public GameObject ModelPrefab;
+  1037→  1037→    public Sprite Portrait;
+  1038→  1038→    
+  1039→  1039→    [Header("Voice")]
+  1040→  1040→    public AudioClip[] VoiceLinesJp;
+  1041→  1041→    public AudioClip[] VoiceLinesEn;
+  1042→  1042→    public AudioClip[] VoiceLinesFr;
+  1043→  1043→    
+  1044→  1044→    [Header("Stats")]
+  1045→  1045→    public StatsBlock BaseStats;
+  1046→  1046→    
+  1047→  1047→    [Header("Skills")]
+  1048→  1048→    public SkillData NormalAttack;
+  1049→  1049→    public SkillData WeaponSkill;
+  1050→  1050→    public SkillData DischargeSkill;
+  1051→  1051→    
+  1052→  1052→    [Header("Awakening")]
+  1053→  1053→    public AwakeningNode[] AwakeningTree;  // 50+ nodes
+  1054→  1054→    public int MaxAwakeningLevel = 6;
+  1055→  1055→    
+  1056→  1056→    [Header("Talents")]
+  1057→  1057→    public TalentSpec PassiveTalent;
+  1058→  1058→    public TalentSpec ActiveTalent1;
+  1059→  1059→    public TalentSpec ActiveTalent2;
+  1060→  1060→    
+  1061→  1061→    [Header("Bond")]
+  1062→  1062→    public BondDialogue[] BondDialogues;   // par niveau d'affection
+  1063→  1063→}
+  1064→  1064→
+  1065→  1065→[System.Serializable]
+  1066→  1066→public class SimulacrumInstance {
+  1067→  1067→    public string Id;
+  1068→  1068→    public string SimulacrumId;
+  1069→  1069→    public string OwnerId;
+  1070→  1070→    public int DupesCount;
+  1071→  1071→    public int AwakeningLevel;
+  1072→  1072→    public List<string> UnlockedTalents = new();
+  1073→  1073→    public int AscensionStars;             // 1-6
+  1074→  1074→    public int BondLevel;                  // 1-10
+  1075→  1075→}
+  1076→  1076→```
+  1077→  1077→
+  1078→  1078→### C. Paramètres Arme
+  1079→  1079→```csharp
+  1080→  1080→[CreateAssetMenu(fileName = "NewWeapon", menuName = "Game/Weapon")]
+  1081→  1081→public class WeaponData : ScriptableObject {
+  1082→  1082→    public string Id;
+  1083→  1083→    public string DisplayName;
+  1084→  1084→    public Rarity Rarity;
+  1085→  1085→    public Element Element;
+  1086→  1086→    public WeaponType WeaponType;
+  1087→  1087→    public float BaseAttack;
+  1088→  1088→    public GameObject ModelPrefab;
+  1089→  1089→    public Sprite Icon;
+  1090→  1090→    
+  1091→  1091→    [Header("Normal Combo")]
+  1092→  1092→    public ComboStep[] NormalCombo;        // 5-7 hits
+  1093→  1093→    
+  1094→  1094→    [Header("Weapon Skill")]
+  1095→  1095→    public SkillData WeaponSkill;
+  1096→  1096→    
+  1097→  1097→    [Header("Discharge (Ultimate)")]
+  1098→  1098→    public SkillData DischargeSkill;
+  1099→  1099→    
+  1100→  1100→    [Header("Stats")]
+  1101→  1101→    public float ShatterEffect;            // break gauge dmg
+  1102→  1102→    public float ChargeRate;               // jauge 0-1000
+  1103→  1103→    public string[] ResonanceTags;
+  1104→  1104→}
+  1105→  1105→
+  1106→  1106→[System.Serializable]
+  1107→  1107→public class ComboStep {
+  1108→  1108→    public string AnimationTrigger;
+  1109→  1109→    public float DamageMultiplier;
+  1110→  1110→    public float StaminaCost;
+  1111→  1111→    public float ChargeGenerated;
+  1112→  1112→    public VfxSpec VfxOnHit;
+  1113→  1113→    public SfxSpec SfxOnHit;
+  1114→  1114→    public bool LiftsEnemy;                // pour aerial combo
+  1115→  1115→    public bool CausesStagger;
+  1116→  1116→}
+  1117→  1117→
+  1118→  1118→[System.Serializable]
+  1119→  1119→public class WeaponInstance {
+  1120→  1120→    public string Id;
+  1121→  1121→    public string WeaponId;
+  1122→  1122→    public string OwnerId;
+  1123→  1123→    public int EnhancementLevel;           // 0-30
+  1124→  1124→    public int AdvancementStars;           // 1-6
+  1125→  1125→    public string[] InsertedMatrices = new string[4];
+  1126→  1126→}
+  1127→  1127→```
+  1128→  1128→
+  1129→  1129→### D. Paramètres combat
+  1130→  1130→```csharp
+  1131→  1131→[System.Serializable]
+  1132→  1132→public class CombatState {
+  1133→  1133→    public string AttackerId;
+  1134→  1134→    public string TargetId;
+  1135→  1135→    public string WeaponUsed;
+  1136→  1136→    public SkillType SkillType;            // normal, skill, discharge, dash, parry
+  1137→  1137→    public Element Element;
+  1138→  1138→    public float BaseDamage;
+  1139→  1139→    public float FinalDamage;              // après def/res/crit
+  1140→  1140→    public bool IsCrit;
+  1141→  1141→    public bool IsWeakness;                // élément favorable
+  1142→  1142→    public bool IsResisted;
+  1143→  1143→    public float ShatterDamage;
+  1144→  1144→    public float ChargeGenerated;
+  1145→  1145→    public List<BuffInstance> BuffsApplied = new();
+  1146→  1146→    public List<BuffInstance> DebuffsApplied = new();
+  1147→  1147→    public Vector3 AttackerPos;
+  1148→  1148→    public Vector3 TargetPos;
+  1149→  1149→    public long Timestamp;
+  1150→  1150→    
+  1151→  1151→    [Header("VFX")]
+  1152→  1152→    public VfxSpec HitVfx;
+  1153→  1153→    public HitstopSpec Hitstop;
+  1154→  1154→    public ScreenShakeSpec Shake;
+  1155→  1155→}
+  1156→  1156→
+  1157→  1157→public enum SkillType { Normal, WeaponSkill, Discharge, Dash, Parry, ChargedAttack }
+  1158→  1158→
+  1159→  1159→[System.Serializable]
+  1160→  1160→public class BuffInstance {
+  1161→  1161→    public string Id;
+  1162→  1162→    public BuffType Type;                  // 50+ types
+  1163→  1163→    public int Stacks;
+  1164→  1164→    public float Duration;
+  1165→  1165→    public float Potency;
+  1166→  1166→    public string Source;                  // simulacrum/weapon/relic
+  1167→  1167→}
+  1168→  1168→
+  1169→  1169→public enum BuffType {
+  1170→  1170→    // Positive
+  1171→  1171→    AttackUp, DefenseUp, SpeedUp, CritUp, CritDamageUp,
+  1172→  1172→    Shield, HealOverTime, Rage, ElementalUp,
+  1173→  1173→    // Negative
+  1174→  1174→    Poison, Burn, Freeze, Stun, Slow, Weakness,
+  1175→  1175→    DefenseDown, AttackDown, Bleed, Confuse, Silence
+  1176→  1176→}
+  1177→  1177→```
+  1178→  1178→
+  1179→  1179→### E. Paramètres ennemis
+  1180→  1180→```csharp
+  1181→  1181→[CreateAssetMenu(fileName = "NewEnemy", menuName = "Game/Enemy")]
+  1182→  1182→public class EnemyData : ScriptableObject {
+  1183→  1183→    public string Id;
+  1184→  1184→    public string DisplayName;
+  1185→  1185→    public string Family;
+  1186→  1186→    public int Level;
+  1187→  1187→    
+  1188→  1188→    [Header("Stats")]
+  1189→  1189→    public float Hp;
+  1190→  1190→    public float Attack;
+  1191→  1191→    public float Defense;
+  1192→  1192→    public Dictionary<Element, float> ElementalResistances = new();  // -1 immune, 0 normal, 1 weak
+  1193→  1193→    
+  1194→  1194→    [Header("Break System")]
+  1195→  1195→    public float ShatterThreshold;
+  1196→  1196→    public float ShatterRecovery;
+  1197→  1197→    
+  1198→  1198→    [Header("AI")]
+  1199→  1199→    public AIArchetype AiArchetype;        // melee, ranged, caster, boss, summoner
+  1200→  1200→    public BehaviorTreeData BehaviorTree;
+  1201→  1201→    public float AggroRange;
+  1202→  1202→    public float LeashRange;
+  1203→  1203→    public AttackPattern[] AttackPatterns;
+  1204→  1204→    
+  1205→  1205→    [Header("Loot")]
+  1206→  1206→    public string LootTableId;
+  1207→  1207→    public long XpReward;
+  1208→  1208→    public long CreditReward;
+  1209→  1209→    
+  1210→  1210→    [Header("Visuals")]
+  1211→  1211→    public GameObject ModelPrefab;
+  1212→  1212→    public GameObject DeathEffect;
+  1213→  1213→    public GameObject HitEffect;
+  1214→  1214→    public AnimationClip[] Animations;
+  1215→  1215→}
+  1216→  1216→
+  1217→  1217→public enum AIArchetype { Melee, Ranged, Caster, Boss, Summoner, Turret }
+  1218→  1218→```
+  1219→  1219→
+  1220→  1220→### F. Paramètres région / monde
+  1221→  1221→```csharp
+  1222→  1222→[CreateAssetMenu(fileName = "NewRegion", menuName = "Game/Region")]
+  1223→  1223→public class RegionData : ScriptableObject {
+  1224→  1224→    public string Id;
+  1225→  1225→    public string DisplayName;
+  1226→  1226→    public Vector2Int LevelRange;
+  1227→  1227→    
+  1228→  1228→    [Header("Map")]
+  1229→  1229→    public string ScenePath;
+  1230→  1230→    public Vector2Int Size;                // tiles
+  1231→  1231→    public int ChunkSize = 32;
+  1232→  1232→    
+  1233→  1233→    [Header("Climate")]
+  1234→  1234→    public WeatherType[] WeatherTypes;
+  1235→  1235→    public string AmbientMusicId;
+  1236→  1236→    public string[] AmbientSfxIds;
+  1237→  1237→    
+  1238→  1238→    [Header("POIs")]
+  1239→  1239→    public POI[] ScenicPoints;
+  1240→  1240→    public POI[] SupplyPods;
+  1241→  1241→    public POI[] Rifts;
+  1242→  1242→    
+  1243→  1243→    [Header("Spawning")]
+  1244→  1244→    public MobSpawn[] MobSpawns;
+  1245→  1245→    public BossSpawn[] BossSpawns;
+  1246→  1246→    
+  1247→  1247→    [Header("Gating")]
+  1248→  1248→    public string RequiredQuestId;
+  1249→  1249→    
+  1250→  1250→    [Header("Visuals")]
+  1251→  1251→    public Color FogColor;
+  1252→  1252→    public float FogDensity;
+  1253→  1253→    public Material SkyboxMaterial;
+  1254→  1254→    public string[] ParticleEffectIds;
+  1255→  1255→}
+  1256→  1256→```
+  1257→  1257→
+  1258→  1258→### G. Paramètres quêtes
+  1259→  1259→```csharp
+  1260→  1260→[CreateAssetMenu(fileName = "NewQuest", menuName = "Game/Quest")]
+  1261→  1261→public class QuestData : ScriptableObject {
+  1262→  1262→    public string Id;
+  1263→  1263→    public QuestType Type;
+  1264→  1264→    public string Title;
+  1265→  1265→    [TextArea] public string Description;
+  1266→  1266→    public string GiverNpcId;
+  1267→  1267→    public string[] Prerequisites;
+  1268→  1268→    public QuestStep[] Steps;
+  1269→  1269→    public Reward[] Rewards;
+  1270→  1270→    public bool Repeatable;
+  1271→  1271→    public ResetSchedule ResetSchedule;
+  1272→  1272→    public bool AutoAccept;
+  1273→  1273→    public int SuggestedLevel;
+  1274→  1274→}
+  1275→  1275→
+  1276→  1276→public enum QuestType { Main, Side, Daily, Weekly, Hidden, Event }
+  1277→  1277→public enum ResetSchedule { None, Daily, Weekly }
+  1278→  1278→
+  1279→  1279→[System.Serializable]
+  1280→  1280→public class QuestStep {
+  1281→  1281→    public string Id;
+  1282→  1282→    public QuestStepType Type;
+  1283→  1283→    public string Target;                  // mob/item/NPC/zone ID
+  1284→  1284→    public int Count;
+  1285→  1285→    public bool Optional;
+  1286→  1286→    public string DialogueTrigger;
+  1287→  1287→    public string NextStepId;
+  1288→  1288→}
+  1289→  1289→
+  1290→  1290→public enum QuestStepType { Kill, Collect, Talk, Reach, Interact, Defend, Escort }
+  1291→  1291→```
+  1292→  1292→
+  1293→  1293→### H. Paramètres économie
+  1294→  1294→```csharp
+  1295→  1295→[CreateAssetMenu(fileName = "EconomyConfig", menuName = "Game/Economy")]
+  1296→  1296→public class EconomyConfig : ScriptableObject {
+  1297→  1297→    [Header("Drop Rates")]
+  1298→  1298→    public float GlobalDropRateMultiplier = 1f;
+  1299→  1299→    
+  1300→  1300→    [Header("Enhancement")]
+  1301→  1301→    public int[] EnhancementCosts = new int[30];
+  1302→  1302→    public string[] EnhancementMats = new string[30];
+  1303→  1303→    public float[] EnhancementSuccessRate = new float[30];
+  1304→  1304→    
+  1305→  1305→    [Header("Advancement")]
+  1306→  1306→    public AdvancementCost[] AdvancementCosts = new AdvancementCost[6];
+  1307→  1307→    
+  1308→  1308→    [Header("Gacha")]
+  1309→  1309→    public GachaRates GachaRates;
+  1310→  1310→    public int PityThreshold = 80;
+  1311→  1311→    public int HardPityThreshold = 120;
+  1312→  1312→    
+  1313→  1313→    [Header("Trading")]
+  1314→  1314→    public float TradeTaxRate = 0.05f;
+  1315→  1315→    public long TradeMinPrice = 100;
+  1316→  1316→    public long TradeMaxPrice = 1000000;
+  1317→  1317→    
+  1318→  1318→    [Header("Daily Login")]
+  1319→  1319→    public Reward[] DailyLoginRewards;
+  1320→  1320→}
+  1321→  1321→
+  1322→  1322→[System.Serializable]
+  1323→  1323→public class GachaRates {
+  1324→  1324→    public float SSR = 0.0075f;
+  1325→  1325→    public float SR = 0.07f;
+  1326→  1326→    public float R = 0.70f;
+  1327→  1327→    public float N = 0.2225f;
+  1328→  1328→}
+  1329→  1329→```
+  1330→  1330→
+  1331→  1331→### I. Paramètres UI / HUD
+  1332→  1332→```csharp
+  1333→  1333→[System.Serializable]
+  1334→  1334→public class UIConfig {
+  1335→  1335→    public UITheme Theme = UITheme.Cyan;
+  1336→  1336→    [Range(0, 1)] public float HudOpacity = 1f;
+  1337→  1337→    public bool DamageNumbersEnabled = true;
+  1338→  1338→    public DamageNumberSize DamageNumbersSize = DamageNumberSize.Medium;
+  1339→  1339→    [Range(0, 1)] public float ScreenshakeIntensity = 1f;
+  1340→  1340→    public bool HitstopEnabled = true;
+  1341→  1341→    public float FloatingCombatTextDuration = 1.5f;
+  1342→  1342→    
+  1343→  1343→    [Header("Minimap")]
+  1344→  1344→    public float MinimapScale = 1f;
+  1345→  1345→    public bool MinimapShowPlayers = true;
+  1346→  1346→    public bool MinimapShowMobs = true;
+  1347→  1347→    public bool MinimapShowCrew = true;
+  1348→  1348→    
+  1349→  1349→    [Header("Touch Controls (mobile)")]
+  1350→  1350→    public float JoystickSize = 120f;
+  1351→  1351→    public float JoystickOpacity = 0.7f;
+  1352→  1352→    public float ButtonSize = 90f;
+  1353→  1353→    public float ButtonOpacity = 0.7f;
+  1354→  1354→    public bool LeftHandedMode = false;
+  1355→  1355→    public float JoystickSensitivity = 1f;
+  1356→  1356→    
+  1357→  1357→    [Header("Controls")]
+  1358→  1358→    public Dictionary<string, string> Keybinds = new();
+  1359→  1359→    
+  1360→  1360→    [Header("Accessibility")]
+  1361→  1361→    public ColorblindMode ColorblindMode = ColorblindMode.Off;
+  1362→  1362→    public float FontScale = 1f;
+  1363→  1363→    public bool SubtitlesEnabled = true;
+  1364→  1364→    public bool ReduceMotion = false;
+  1365→  1365→}
+  1366→  1366→
+  1367→  1367→public enum UITheme { Cyan, Volt, Flame, Ice, Altered, Shadow }
+  1368→  1368→public enum DamageNumberSize { Small, Medium, Large }
+  1369→  1369→public enum ColorblindMode { Off, Protanopia, Deuteranopia, Tritanopia }
+  1370→  1370→```
+  1371→  1371→
+  1372→  1372→### J. Paramètres netcode
+  1373→  1373→```csharp
+  1374→  1374→[System.Serializable]
+  1375→  1375→public class NetworkConfig {
+  1376→  1376→    public int TickRate = 20;              // Hz positions
+  1377→  1377→    public int SnapshotBufferSizeMs = 100;
+  1378→  1378→    public int InterpolationDelayMs = 100;
+  1379→  1379→    public int MaxReconnectTimeSec = 300;
+  1380→  1380→    
+  1381→  1381→    [Header("Interest Management")]
+  1382→  1382→    public float ViewDistance = 100f;      // tiles
+  1383→  1383→    public float RelevancyThreshold = 0.1f;
+  1384→  1384→    
+  1385→  1385→    [Header("Rate Limits")]
+  1386→  1386→    public int MaxPacketsPerSecond = 60;
+  1387→  1387→    public int ChatRateLimit = 5;          // msgs / 10s
+  1388→  1388→    
+  1389→  1389→    [Header("Anti-cheat")]
+  1390→  1390→    public float MaxSpeedThreshold = 15f;  // tiles/sec
+  1391→  1391→    public float MaxDamagePerHit = 100000f;
+  1392→  1392→    public bool AuditLogEnabled = true;
+  1393→  1393→}
+  1394→  1394→```
+  1395→  1395→
+  1396→  1396→### K. Paramètres cosmétiques
+  1397→  1397→```csharp
+  1398→  1398→[CreateAssetMenu(fileName = "NewCosmetic", menuName = "Game/Cosmetic")]
+  1399→  1399→public class CosmeticData : ScriptableObject {
+  1400→  1400→    public string Id;
+  1401→  1401→    public CosmeticType Type;
+  1402→  1402→    public Rarity Rarity;
+  1403→  1403→    public CosmeticSource Source;
+  1404→  1404→    public CurrencyPrice Price;
+  1405→  1405→    public GameObject AssetPrefab;
+  1406→  1406→    public string PreviewAnimation;
+  1407→  1407→}
+  1408→  1408→
+  1409→  1409→public enum CosmeticType { Skin, Mount, ChatBubble, Nameplate, Portrait, Emote }
+  1410→  1410→public enum CosmeticSource { Shop, Event, Achievement, BattlePass }
+  1411→  1411→```
+  1412→  1412→
+  1413→  1413→---
+  1414→  1414→
+  1415→  1415→## 🔐 ANTI-CHEAT — STRATÉGIE OBLIGATOIRE
+  1416→  1416→
+  1417→  1417→| Risque | Mitigation |
+  1418→  1418→|---|---|
+  1419→  1419→| Speed hack | Validation vitesse serveur (max 1.2x moveSpeed) |
+  1420→  1420→| Damage hack | Tout dégât calculé serveur, client n'envoie que "I attacked with weapon X at time T" |
+  1421→  1421→| Duplication | Transactions DB atomiques + inventory locks |
+  1422→  1422→| Packet replay | Nonces + timestamps, drop si delta > 2s |
+  1423→  1423→| Aimbot | Valider hitbox server-side (lag compensation rewind) |
+  1424→  1424→| Wall hack | Culling serveur (interest management) |
+  1425→  1425→| Bot farming | Captcha périodique + détection patterns + rate limits |
+  1426→  1426→| Memory editing | Cheat Engine → données critiques serveur uniquement |
+  1427→  1427→| Trade scam | Confirmation 2FA + trade log audit |
+  1428→  1428→| Gacha manipulation | RNG seedé serveur, audit trail complet |
+  1429→  1429→
+  1430→  1430→---
+  1431→  1431→
+  1432→  1432→## 📊 TELEMÉTRIE & BALANCE
+  1433→  1433→
+  1434→  1434→### Métriques à tracker (Unity Analytics + PostHog + Grafana)
+  1435→  1435→- **Acquisition** : DAU/MAU, retention J1/J7/J30, LTV, CAC
+  1436→  1436→- **Engagement** : session length, quests/day, gacha pulls/day, regions visited
+  1437→  1437→- **Economy** : gold flow, dark crystals velocity, trade volume, inflation
+  1438→  1438→- **Combat balance** : win rate par simulacrum/weapon/boss, TTK, death causes
+  1439→  1439→- **Performance** : FPS, latency, crash rate, OOM, battery drain (mobile)
+  1440→  1440→- **Monetization** : ARPU, ARPPU, conversion rate, top items
+  1441→  1441→- **Social** : crew size, group rate, chat messages, PvP participation
+  1442→  1442→
+  1443→  1443→### A/B tests à planifier
+  1444→  1444→- Taux gacha (0.75% vs 1%)
+  1445→  1445→- Coût enhancement
+  1446→  1446→- Difficulté boss
+  1447→  1447→- UI onboarding flow
+  1448→  1448→- Notifications push timing
+  1449→  1449→- Battle pass rewards curve
+  1450→  1450→
+  1451→  1451→---
+  1452→  1452→
+  1453→  1453→## 🚀 DÉPLOIEMENT & INFRA
+  1454→  1454→
+  1455→  1455→### Environnements
+  1456→  1456→| Env | Usage | Branch | URL |
+  1457→  1457→|---|---|---|---|
+  1458→  1458→| local | Dev | main | localhost |
+  1459→  1459→| dev | Tests auto | PR | dev.game.example |
+  1460→  1460→| staging | QA interne | develop | staging.game.example |
+  1461→  1461→| preprod | Soak tests | release/* | preprod.game.example |
+  1462→  1462→| prod | Live | main tagged | play.game.example |
+  1463→  1463→
+  1464→  1464→### Stack cloud
+  1465→  1465→- **Compute** : Kubernetes (EKS/GKE/AKS)
+  1466→  1466→- **DB** : RDS PostgreSQL (multi-AZ, read replicas)
+  1467→  1467→- **Cache** : ElastiCache Redis (cluster mode)
+  1468→  1468→- **CDN** : CloudFront pour assets Addressables
+  1469→  1469→- **Realtime** : Nakama cluster (Go binaries)
+  1470→  1470→- **Storage** : S3 pour saves/screenshots/uploads
+  1471→  1471→- **DNS** : Route53 + Cloudflare (DDoS protection)
+  1472→  1472→- **Monitoring** : Datadog (APM) + Grafana + Sentry (errors)
+  1473→  1473→- **CI/CD** : GitHub Actions → Unity Cloud Build → ECR → ArgoCD
+  1474→  1474→
+  1475→  1475→### Scaling prévisionnel
+  1476→  1476→- 1k joueurs simultanés : 3 pods Nakama (4 vCPU/8 Go chacun)
+  1477→  1477→- 10k joueurs : 15 pods + 2 read replicas + Redis cluster 6 nodes
+  1478→  1478→- 100k joueurs : 50 pods + sharding par région + CDN edge
+  1479→  1479→
+  1480→  1480→---
+  1481→  1481→
+  1482→  1482→## ✅ CHECKLIST FINALE — AVANT DE COMMENCER À CODER
+  1483→  1483→
+  1484→  1484→- [ ] GDD validé par toute l'équipe
+  1485→  1485→- [ ] Style guide visuel approuvé (ToF + Solo Leveling)
+  1486→  1486→- [ ] Schémas ScriptableObjects définis et validés
+  1487→  1487→- [ ] Pipeline asset testé end-to-end (FBX → Unity → Addressables)
+  1488→  1488→- [ ] Repo Git initialisé avec Git LFS
+  1489→  1489→- [ ] Unity 6000.0 LTS installé + URP configuré
+  1490→  1490→- [ ] CI GitHub Actions verte (build + tests)
+  1491→  1491→- [ ] DB schema Nakama validé
+  1492→  1492→- [ ] 1 simulacrum + 1 arme + 1 ennemi en data
+  1493→  1493→- [ ] Prototype graybox 1 zone jouable
+  1494→  1494→- [ ] Anti-cheat spec écrit et review
+  1495→  1495→- [ ] Plan de tests (unit + integration + e2e + balance)
+  1496→  1496→- [ ] Budget et timeline validés
+  1497→  1497→- [ ] Legal review (RGPD, loot box disclosure, age rating)
+  1498→  1498→- [ ] **Assets visuels demandés à l'utilisateur** (modèles 3D, VFX, audio, dialogues)
+  1499→  1499→
+  1500→  1500→---
+  1501→  1501→
+  1502→  1502→## 🎨 CRÉATION DE PERSONNAGE 3D — MÉTHODE CHOISIE
+  1503→  1503→
+  1504→  1504→> **Question :** Peut-on créer un vrai personnage 3D pour le jeu depuis une image 2D ?
+  1505→  1505→> **Réponse :** Oui, via un **pipeline Image-to-3D API**. C'est la meilleure option pour la qualité.
+  1506→  1506→
+  1507→  1507→### ❌ Méthodes écartées
+  1508→  1508→
+  1509→  1509→| Méthode | Pourquoi écartée |
+  1510→  1510→|---|---|
+  1511→  1511→| Mesh procédural C# dans Unity | Blocqueux, qualité type Roblox, pas niveau ToF |
+  1512→  1512→| Sculpter à la main dans Blender | Je ne peux pas ouvrir Blender/sculpter |
+  1513→  1513→| Générer un `.psd` | Ce n'est pas un fichier 3D, juste un concept art |
+  1514→  1514→| Acheter sur asset store | Pas personnalisé au personnage de l'utilisateur |
+  1515→  1515→
+  1516→  1516→### ✅ Méthode choisie : Pipeline Image-to-3D (Meshy.ai + Mixamo + Unity)
+  1517→  1517→
+  1518→  1518→**Flow complet** (script Python + Unity) :
+  1519→  1519→
+  1520→  1520→```
+  1521→  1521→Image 2D de l'utilisateur
+  1522→  1522→       ↓
+  1523→  1523→[1] Script Python : appelle Meshy.ai API
+  1524→  1524→       → envoie l'image
+  1525→  1525→       → reçoit un .glb (mesh + textures PBR, ~10k polys)
+  1526→  1526→       (durée : 1-3 minutes, coût : ~1$ ou gratuit avec quota)
+  1527→  1527→       ↓
+  1528→  1528→[2] Auto-rig via Mixamo (semi-manuel, 5 min)
+  1529→  1529→       → upload du .glb sur mixamo.com
+  1530→  1530→       → auto-détection des joints
+  1531→  1531→       → download .fbx riggé Humanoid
+  1532→  1532→       ↓
+  1533→  1533→[3] Import dans Unity
+  1534→  1534→       → .fbx placé dans Assets/_Project/Characters/Player/Models/
+  1535→  1535→       → Animation Type = Humanoid
+  1536→  1536→       → Apply
+  1537→  1537→       ↓
+  1538→  1538→[4] Application du Toon Shader URP (déjà codé)
+  1539→  1539→       → StellarOdyssey/Toon shader appliqué
+  1540→  1540→       → Cell-shading + outlines noirs manga
+  1541→  1541→       → Palette personnalisée (noir/cyan/bleu)
+  1542→  1542→       ↓
+  1543→  1543→[5] Animations procédurales (déjà codées dans PlayerAnimator3D.cs)
+  1544→  1544→       → idle, walk, run, jump, attack combos, dash, hit reaction
+  1545→  1545→       → Pas besoin de fichiers .anim externes
+  1546→  1546→       ↓
+  1547→  1547→[6] Prefab Unity assemblé via config JSON
+  1548→  1548→       → CharacterGenerator + PlayerController3D + PlayerAnimator3D + PlayerCombat3D
+  1549→  1549→       → Personnage prêt à jouer
+  1550→  1550→```
+  1551→  1551→
+  1552→  1552→### Fichiers fournis
+  1553→  1553→
+  1554→  1554→| Fichier | Rôle |
+  1555→  1555→|---|---|
+  1556→  1556→| `unity-project/tools/generate_character_3d.py` | Script Python qui pilote Meshy.ai API + génère config Unity |
+  1557→  1557→| `unity-project/Assets/_Project/Characters/Player/CharacterGenerator.cs` | Générateur de personnage procédural (fallback si pas d'API) |
+  1558→  1558→| `unity-project/Assets/_Project/Characters/Player/PlayerAnimator3D.cs` | Animations procédurales dynamiques |
+  1559→  1559→| `unity-project/Assets/_Project/Characters/Player/PlayerController3D.cs` | Contrôleur mouvement 3rd person |
+  1560→  1560→| `unity-project/Assets/_Project/Characters/Player/PlayerCombat3D.cs` | Système de combat (combos + hitstop + VFX) |
+  1561→  1561→| `unity-project/Assets/_Project/Rendering/ToonShader.shader` | Shader URP cell-shaded + outlines |
+  1562→  1562→
+  1563→  1563→### Comment lancer le pipeline
+  1564→  1564→
+  1565→  1565→```bash
+  1566→  1566→# 1. Installer les dépendances
+  1567→  1567→pip install requests
+  1568→  1568→
+  1569→  1569→# 2. Créer un compte Meshy.ai (gratuit, 50 crédits/mois)
+  1570→  1570→#    → https://meshy.ai
+  1571→  1571→#    → Récupérer la clé API dans le dashboard
+  1572→  1572→
+  1573→  1573→# 3. Lancer le pipeline avec ton image
+  1574→  1574→cd unity-project/tools
+  1575→  1575→python generate_character_3d.py \
+  1576→  1576→  --image ./mon_personnage.jpg \
+  1577→  1577→  --name "Shiro" \
+  1578→  1578→  --api-key MESHY_xxxxxxx
+  1579→  1579→
+  1580→  1580→# 4. Suivre les instructions de rigging (RIGGING_INSTRUCTIONS.txt)
+  1581→  1581→# 5. Importer le .fbx dans Unity
+  1582→  1582→```
+  1583→  1583→
+  1584→  1584→### Qualité attendue
+  1585→  1585→
+  1586→  1586→| Aspect | Niveau |
+  1587→  1587→|---|---|
+  1588→  1588→| Polycount | ~10 000 polys (mobile-friendly) |
+  1589→  1589→| Textures | PBR (albedo + normal + metallic) |
+  1590→  1590→| Rig | Humanoid (compatible Unity Animator) |
+  1591→  1591→| Cell-shading | Appliqué via ToonShader URP |
+  1592→  1592→| Animations | Procédurales dynamiques (déjà codées) |
+  1593→  1593→| Dynamisme | Hitstop + screen shake + slow-mo (déjà codés) |
+  1594→  1594→
+  1595→  1595→### Limites assumées
+  1596→  1596→
+  1597→  1597→- La qualité ne sera pas 100% Tower of Fantasy (ToF = 3D artists pro pendant des semaines)
+  1598→  1598→- Le mesh peut nécessiter des retouches dans Blender (cleanup topology)
+  1599→  1599→- Le rig Mixamo est générique (pas parfait pour postures exotiques)
+  1600→  1600→- Les textures PBR seront converties en cell-shaded via le toon shader
+  1601→  1601→
+  1602→  1602→### Améliorations possibles (phases ultérieures)
+  1603→  1603→
+  1604→  1604→1. **Retopology** dans Blender (ZRemesher) pour mesh plus propre
+  1605→  1605→2. **Custom rig** dans Blender (Auto-Rig Pro) pour animations plus naturelles
+  1606→  1606→3. **Texture painting** custom pour style anime plus poussé
+  1607→  1607→4. **Blend shapes** pour expressions faciales
+  1608→  1608→5. **Multiple LODs** pour perf mobile
+  1609→  1609→
+  1610→  1610→---
+  1611→  1611→
+  1612→  1612→## 🤖 IA NIVEAU 1 — SYSTÈME COMPLET
+  1613→  1613→
+  1614→  1614→> **Question :** Peut-on mettre une IA en arrière-plan pour gérer personnages et mouvements ?
+  1615→  1615→> **Réponse :** Oui. Niveau 1 = Behavior Trees (gratuit, déterministe, performant).
+  1616→  1616→> Code un système complet prenant en compte le maximum de paramètres.
+  1617→  1617→
+  1618→  1618→### Architecture du système IA Niveau 1
+  1619→  1619→
+  1620→  1620→```
+  1621→  1621→                    ┌─────────────────────┐
+  1622→  1622→                    │   EnemyAI3D.cs      │  (cerveau, assemble tout)
+  1623→  1623→                    └──────────┬──────────┘
+  1624→  1624→           ┌───────────────────┼───────────────────┐
+  1625→  1625→           ↓                   ↓                   ↓
+  1626→  1626→  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐
+  1627→  1627→  │ BehaviorTree   │  │ Perception     │  │ EmotionSystem  │
+  1628→  1628→  │ (runtime BT)   │  │ (vue+ouïe+mémoire)│  │ (peur/colère)  │
+  1629→  1629→  └────────────────┘  └────────────────┘  └────────────────┘
+  1630→  1630→           ↓                   ↓                   ↓
+  1631→  1631→  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐
+  1632→  1632→  │ GroupTactics   │  │ Pathfinding    │  │ EnemyHealth3D  │
+  1633→  1633→  │ (flanking/help)│  │ (A*+steering)  │  │ (status+shatter)│
+  1634→  1634→  └────────────────┘  └────────────────┘  └────────────────┘
+  1635→  1635→```
+  1636→  1636→
+  1637→  1637→### Paramètres pris en compte (inventaire exhaustif)
+  1638→  1638→
+  1639→  1639→#### A. Behavior Tree (BT runtime complet)
+  1640→  1640→- **Composites** : Sequence (AND), Selector (OR), Parallel
+  1641→  1641→- **Decorators** : Inverter, Repeater, Retry, Cooldown, Timeout
+  1642→  1642→- **Leaves** : ActionNode (Func<NodeState>), ConditionNode (Func<bool>)
+  1643→  1643→- **Blackboard** : mémoire partagée (lastKnownPos, emotions, status, etc.)
+  1644→  1644→
+  1645→  1645→#### B. Perception (vue + ouïe + mémoire)
+  1646→  1646→| Paramètre | Valeur par défaut | Description |
+  1647→  1647→|---|---|---|
+  1648→  1648→| `viewDistance` | 15 m | Distance de vision |
+  1649→  1649→| `viewAngle` | 120° | Cône de vision |
+  1650→  1650→| `eyeHeight` | 1.6 m | Hauteur des yeux |
+  1651→  1651→| `visionBlockMask` | obstacles | Couches qui bloquent la vue |
+  1652→  1652→| `hearingRadius` | 8 m | Rayon d'audition (pas, dialogues) |
+  1653→  1653→| `combatNoiseRadius` | 15 m | Rayon pour bruits de combat |
+  1654→  1654→| `memoryDuration` | 5 s | Durée de mémoire après perte de vue |
+  1655→  1655→| `investigateRadius` | 4 m | Zone d'investigation |
+  1656→  1656→| `detectionSpeed` | 2/s | Vitesse de remplissage jauge détection |
+  1657→  1657→| `detectionThreshold` | 1.0 | Seuil d'alerte |
+  1658→  1658→| `loseSightSpeed` | 3/s | Vitesse de perte de détection |
+  1659→  1659→
+  1660→  1660→**Fonctionnalités** :
+  1661→  1661→- Détection progressive (jauge qui se remplit, pas binaire)
+  1662→  1662→- Occlusion (raycast pour vérifier les obstacles)
+  1663→  1663→- Alertes propagées aux alliés proches
+  1664→  1664→- Mémoire de dernière position connue
+  1665→  1665→- Investigation de la dernière position
+  1666→  1666→
+  1667→  1667→#### C. Émotions (peur, colère, curiosité, confiance)
+  1668→  1668→| Émotion | Plage | Effets |
+  1669→  1669→|---|---|---|
+  1670→  1670→| `fear` | 0-1 | >0.7 → fuite, >0.5 → prudent |
+  1671→  1671→| `anger` | 0-1 | >0.8 → berserk (+50% attack speed, +30% damage) |
+  1672→  1672→| `curiosity` | 0-1 | >0.6 → investigation des bruits |
+  1673→  1673→| `confidence` | 0-1 | <0.3 → cautious approach, esquive fréquente |
+  1674→  1674→
+  1675→  1675→**Triggers émotionnels** :
+  1676→  1676→- `OnTakeDamage(amount, isCrit)` → +peur, +colère, -confiance
+  1677→  1677→- `OnAllyDied()` → +peur, -confiance
+  1678→  1678→- `OnSuccessfulAttack()` → +confiance, +colère
+  1679→  1679→- `OnPlayerSpotted()` → +colère, -curiosité
+  1680→  1680→- `OnLostPlayer()` → +curiosité
+  1681→  1681→- `OnKillPlayer()` → confidence=1, anger=0, fear=0
+  1682→  1682→
+  1683→  1683→#### D. Tactique de groupe
+  1684→  1684→| Paramètre | Description |
+  1685→  1685→|---|---|
+  1686→  1686→| `factionId` | Identifiant de faction (ennemis d'une même faction collaborent) |
+  1687→  1687→| `allyDetectionRadius` | Rayon de détection des alliés |
+  1688→  1688→| `callHelpThreshold` | HP < 30% → appelle à l'aide |
+  1689→  1689→| `callHelpRadius` | Portée de l'appel à l'aide |
+  1690→  1690→| `maxAttackersSimultaneous` | Max 3 ennemis attaquant en même temps (anti swarm) |
+  1691→  1691→| `useFlanking` | Active le flanking (encerclement) |
+  1692→  1692→| `flankSpreadAngle` | Angle de dispersion en cercle |
+  1693→  1693→| `preferredDistance` | Distance préférée selon le rôle |
+  1694→  1694→
+  1695→  1695→**Rôles de combat** :
+  1696→  1696→- `Tank` → front, garde distance courte (1.5m)
+  1697→  1697→- `DPS` → côtés, distance moyenne (3m)
+  1698→  1698→- `Ranged` → arrière, distance longue (6m)
+  1699→  1699→- `Support` → arrière, très longue distance (8m), soigne/buff
+  1700→  1700→
+  1701→  1701→**Slots d'attaque** :
+  1702→  1702→- Attribution dynamique (slot 0, 1, 2)
+  1703→  1703→- Libération après attaque
+  1704→  1704→- Limite d'attaquants simultanés réglable
+  1705→  1705→
+  1706→  1706→#### E. Pathfinding & steering
+  1707→  1707→| Behavior | Description |
+  1708→  1708→|---|---|
+  1709→  1709→| `Seek` | Se déplace vers un point |
+  1710→  1710→| `Flee` | Fuit un point (panique si proche) |
+  1711→  1711→| `Arrive` | Seek avec décélération à l'arrivée |
+  1712→  1712→| `Wander` | Déplacement aléatoire (patrouille) |
+  1713→  1713→| `ObstacleAvoidance` | Évite les obstacles (spherecast) |
+  1714→  1714→| `Separation` | Évite les autres ennemis (anti-stack) |
+  1715→  1715→
+  1716→  1716→#### F. Système de santé & status effects
+  1717→  1717→| Status | Effet |
+  1718→  1718→|---|---|
+  1719→  1719→| `Burn` | DoT 5 HP/s |
+  1720→  1720→| `Freeze` | Stun + ralentissement |
+  1721→  1721→| `Poison` | DoT 8 HP/s |
+  1722→  1722→| `Stun` | Immobile, incapable d'attaquer |
+  1723→  1723→| `Slow` | -50% vitesse |
+  1724→  1724→| `Weakness` | -30% dégâts |
+  1725→  1725→| `Bleed` | DoT + saignement visuel |
+  1726→  1726→| `Confuse` | Mouvements aléatoires |
+  1727→  1727→| `Silence` | Ne peut pas utiliser compétences |
+  1728→  1728→
+  1729→  1729→**Shatter gauge** (système de break) :
+  1730→  1730→- S'accumule avec les dégâts
+  1731→  1731→- À 100% → stun 2s + ouverture aux critiques
+  1732→  1732→- Récupération progressive
+  1733→  1733→
+  1734→  1734→#### G. Résistances élémentaires
+  1735→  1735→| Élément | Effet |
+  1736→  1736→|---|---|
+  1737→  1737→| -1 | Immunisé (0 dégâts) |
+  1738→  1738→| 0 | Normal |
+  1739→  1739→| +1 | Faiblesse (dégâts x2) |
+  1740→  1740→
+  1741→  1741→6 éléments : Flame, Ice, Volt, Physical, Altered, Shadow
+  1742→  1742→
+  1743→  1743→#### H. Difficulté scalable
+  1744→  1744→| Niveau | Aggro Range | Damage | Cooldown | Reaction |
+  1745→  1745→|---|---|---|---|---|
+  1746→  1746→| Easy | x0.6 | x0.6 | x1.5 | x0.5 |
+  1747→  1747→| Normal | x1.0 | x1.0 | x1.0 | x1.0 |
+  1748→  1748→| Hard | x1.4 | x1.4 | x0.7 | x1.5 |
+  1749→  1749→| Nightmare | x1.8 | x1.8 | x0.5 | x2.0 |
+  1750→  1750→
+  1751→  1751→#### I. Day/Night behavior
+  1752→  1752→- `dayAggroMultiplier` = 1.0 (jour)
+  1753→  1753→- `nightAggroMultiplier` = 1.4 (nuit, ennemis plus agressifs)
+  1754→  1754→- Détection via `isNighttime` bool
+  1755→  1755→
+  1756→  1756→### Arbre de comportement typique (Root)
+  1757→  1757→
+  1758→  1758→```
+  1759→  1759→ROOT (Selector priority)
+  1760→  1760→├── 1. DEAD → do nothing
+  1761→  1761→├── 2. STUNNED → wait (status: stun/freeze)
+  1762→  1762→├── 3. FLEE → if fear > 0.7 AND anger < 0.8
+  1763→  1763→│   └── Flee player + Seek spawn + CallForHelp
+  1764→  1764→├── 4. BERSERK → if anger > 0.8
+  1765→  1765→│   └── Charge player + Attack (ignore fear)
+  1766→  1766→├── 5. INVESTIGATE → if heard/saw but lost player
+  1767→  1767→│   └── Move to lastKnownPos + search pattern
+  1768→  1768→├── 6. ATTACK → if can see + in range + cooldown ok + slot available
+  1769→  1769→│   └── Face player + Deal damage + Release slot
+  1770→  1770→├── 7. CHASE → if can see player, not in range
+  1771→  1771→│   └── Flank position + Arrive + ObstacleAvoid
+  1772→  1772→├── 8. RETREAT → if too far from spawn (> leashDistance)
+  1773→  1773→│   └── Arrive spawn
+  1774→  1774→└── 9. PATROL (default)
+  1775→  1775→    └── Wander + ObstacleAvoid + Return to spawn if far
+  1776→  1776→```
+  1777→  1777→
+  1778→  1778→### Fichiers fournis
+  1779→  1779→
+  1780→  1780→| Fichier | Rôle |
+  1781→  1781→|---|---|
+  1782→  1782→| `AI/BehaviorTree.cs` | Runtime BT (Sequence, Selector, Parallel, Decorators, Blackboard) |
+  1783→  1783→| `AI/PerceptionSystem.cs` | Vue cône + ouïe + mémoire + alertes |
+  1784→  1784→| `AI/EmotionSystem.cs` | Peur/colère/curiosité/confiance + triggers |
+  1785→  1785→| `AI/GroupTactics.cs` | Faction, flanking, call help, attack slots, roles |
+  1786→  1786→| `AI/PathfindingAgent.cs` | A* + Seek/Flee/Arrive/Wander/Avoidance/Separation |
+  1787→  1787→| `AI/EnemyHealth3D.cs` | HP + status effects + shatter gauge + résistances |
+  1788→  1788→| `Enemies/EnemyAI3D.cs` | Assemblage complet + BT construction + difficulty scaling |
+  1789→  1789→| `Enemies/Boss3D.cs` | Boss avec 3 phases + 5 patterns d'attaque |
+  1790→  1790→| `Enemies/BossProjectile3D.cs` | Projectiles boss (avec homing optionnel) |
+  1791→  1791→| `Enemies/FloatingDamage3D.cs` | Chiffres flottants colorés (crit = orange) |
+  1792→  1792→
+  1793→  1793→### Ce que ce système gère automatiquement (sans coder chaque event)
+  1794→  1794→
+  1795→  1795→✅ Détection progressive du joueur (pas binaire)
+  1796→  1796→✅ Perte de vue → investigation de la dernière position
+  1797→  1797→✅ Dégâts reçus → peur + colère + perte de confiance
+  1798→  1798→✅ HP bas → appel à l'aide aux alliés
+  1799→  1799→✅ Allié tué → peur augmente chez les témoins
+  1800→  1800→✅ Trop d'ennemis autour du joueur → slots d'attaque limités (anti-swarm)
+  1801→  1801→✅ Évitement d'obstacles dynamique
+  1802→  1802→✅ Séparation entre ennemis (anti-stack)
+  1803→  1803→✅ Flanking (encerclement du joueur)
+  1804→  1804→✅ Rôles différents (tank front, ranged back, support très back)
+  1805→  1805→✅ Status effects (burn/freeze/poison/stun) modifient le BT
+  1806→  1806→✅ Shatter gauge → stun sur break
+  1807→  1807→✅ Résistances élémentaires
+  1808→  1808→✅ Day/night : aggro plus forte la nuit
+  1809→  1809→✅ 4 niveaux de difficulté (Easy → Nightmare)
+  1810→  1810→✅ Émotions influencent vitesse, dégâts, comportement
+  1811→  1811→
+  1812→  1812→### Ce que ce système NE gère pas (niveau 2+)
+  1813→  1813→
+  1814→  1814→❌ Dialogues générés par LLM (niveau 3)
+  1815→  1815→❌ Apprentissage par renforcement (niveau 4, ML-Agents)
+  1816→  1816→❌ Quêtes dynamiques émergentes (niveau 3, Utility AI)
+  1817→  1817→❌ PNJ non combattants vivants (niveau 2, Utility AI)
+  1818→  1818→
+  1819→  1819→---
+  1820→  1820→
+  1821→  1821→## 🎯 PRIORITÉS POUR L'IA QUI CODE
+  1822→  1822→
+  1823→  1823→> **Lis cette section en premier avant chaque phase.**
+  1824→  1824→
+  1825→  1825→1. **SYSTÈME > DESIGN.** Code un univers fonctionnel avant de polir le visuel.
+  1826→  1826→2. **DEMANDE les assets visuels.** Ne crée pas des assets bidon, demande à l'utilisateur.
+  1827→  1827→3. **DATA-DRIVEN.** Tout contenu en ScriptableObjects, jamais hardcodé.
+  1828→  1828→4. **AUTHORITÉ SERVEUR.** Tout ce qui compte (HP, dégâts, loot, monnaie) est validé serveur.
+  1829→  1829→5. **TOUCH CONTROLS.** Toujours implémenter les contrôles tactiles à l'écran, pas seulement KB/mouse.
+  1830→  1830→6. **ANIME DYNAMISME.** Hitstop, screen shake, slow-mo, slash trails = obligatoires dès le combat de base.
+  1831→  1831→7. **TESTE en continu.** Tests unitaires sur formules, tests playmode sur gameplay.
+  1832→  1832→8. **DOCUMENTE.** Chaque système a son `.md` dans `/docs/`.
+  1833→  1833→9. **BALANCE.** Simulateur de combat pour valider la balance avant release.
+  1834→  1834→10. **L'UTILISATEUR DEMANDE des correctifs design.** Le design s'itère après, sur demande.
+  1835→  1835→
+  1836→  1836→---
+  1837→  1837→
+  1838→  1838→> **Note finale** : ce document est une **carte de navigation**, pas une doc exhaustive. Chaque section méritera son propre fichier détaillé dans `/docs/` au fur et à mesure. La règle d'or : **autorité serveur sur tout ce qui compte** (HP, dégâts, loot, monnaie) — le client n'est qu'un terminal d'affichage. Le style visuel **anime 3D cell-shaded dynamique type Solo Leveling** est non-négociable. L'IA **doit demander** les assets visuels qu'elle ne peut pas coder.
+  1839→  1839→
