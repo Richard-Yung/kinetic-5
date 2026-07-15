@@ -1,0 +1,29 @@
+{
+    "name": "KINETICS5.Tests",
+    "rootNamespace": "KINETICS5.Tests",
+    "references": [
+        "KINETICS5.Core",
+        "KINETICS5.Data",
+        "KINETICS5.Gameplay",
+        "KINETICS5.Network",
+        "Newtonsoft.Json",
+        "UniTask",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "UniTask.dll",
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

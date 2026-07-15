@@ -1,0 +1,247 @@
+[
+  {
+    "id": "shadow_fall",
+    "displayName": "SHADOW FALL",
+    "description": "Infiltrer le cargo MV Tarnhelm, sécuriser la soute et exfiltrer la core de données. Mission d'introduction.",
+    "type": "Extraction",
+    "region": "tarnhelm",
+    "recommendedPower": 2000,
+    "objectives": [
+      { "id": "sf_o1", "description": "Atteindre la soute cargo", "kind": "Reach", "targetId": "zone_cargo", "requiredCount": 1, "rewardXp": 300, "rewardCr": 150 },
+      { "id": "sf_o2", "description": "Éliminer l'escorte de sécurité", "kind": "Eliminate", "targetId": "grunt_mk1", "requiredCount": 8, "rewardXp": 500, "rewardCr": 250 },
+      { "id": "sf_o3", "description": "Exfiltrer la core de données", "kind": "Extract", "targetId": "data_core", "requiredCount": 1, "rewardXp": 700, "rewardCr": 400 }
+    ],
+    "waves": [
+      { "id": "sf_w1", "delay": 0, "enemyId": "grunt_mk1", "count": 4, "spawnPoint": { "x": 20, "y": 0, "z": -15 } },
+      { "id": "sf_w2", "delay": 25, "enemyId": "grunt_mk1", "count": 4, "spawnPoint": { "x": -20, "y": 0, "z": -15 } },
+      { "id": "sf_w3", "delay": 50, "enemyId": "assault_droid", "count": 3, "spawnPoint": { "x": 0, "y": 0, "z": -25 } }
+    ],
+    "bossPhases": [],
+    "timeLimit": 0,
+    "stealthOptional": true,
+    "rewards": {
+      "xp": 1500,
+      "cr": 800,
+      "lootTable": [
+        { "itemId": "ammo_kinetic", "dropChancePct": 100, "minQty": 5, "maxQty": 10 },
+        { "itemId": "mod_common", "dropChancePct": 40, "minQty": 1, "maxQty": 1 }
+      ]
+    },
+    "sceneName": "Mission_ShadowFall",
+    "environment": { "shipType": "CargoShip", "lighting": "Dim", "atmosphere": "Vacuum" }
+  },
+  {
+    "id": "neural_breach",
+    "displayName": "NEURAL BREACH",
+    "description": "Saboter le croiseur lourd Kriegsonde en détruisant son noyau neural. Défense renforcée.",
+    "type": "Sabotage",
+    "region": "kriegsonde",
+    "recommendedPower": 2800,
+    "objectives": [
+      { "id": "nb_o1", "description": "Faire sauter la coque externe", "kind": "Sabotage", "targetId": "hull_panel", "requiredCount": 2, "rewardXp": 400, "rewardCr": 200 },
+      { "id": "nb_o2", "description": "Couper l'alimentation principale", "kind": "Sabotage", "targetId": "power_relay", "requiredCount": 3, "rewardXp": 600, "rewardCr": 300 },
+      { "id": "nb_o3", "description": "Détruire le noyau neural", "kind": "Sabotage", "targetId": "neural_core_terminal", "requiredCount": 1, "rewardXp": 1500, "rewardCr": 900 }
+    ],
+    "waves": [
+      { "id": "nb_w1", "delay": 0, "enemyId": "grunt_mk1", "count": 5, "spawnPoint": { "x": 15, "y": 0, "z": -10 } },
+      { "id": "nb_w2", "delay": 20, "enemyId": "assault_droid", "count": 4, "spawnPoint": { "x": -15, "y": 0, "z": -10 } },
+      { "id": "nb_w3", "delay": 40, "enemyId": "elite_guard", "count": 2, "spawnPoint": { "x": 0, "y": 0, "z": -20 } },
+      { "id": "nb_w4", "delay": 60, "enemyId": "sniper_drone", "count": 2, "spawnPoint": { "x": 25, "y": 5, "z": -30 } },
+      { "id": "nb_w5", "delay": 80, "enemyId": "heavy_unit", "count": 1, "spawnPoint": { "x": 0, "y": 0, "z": -25 } }
+    ],
+    "bossPhases": [],
+    "timeLimit": 0,
+    "stealthOptional": false,
+    "rewards": {
+      "xp": 2500,
+      "cr": 1400,
+      "lootTable": [
+        { "itemId": "ammo_kinetic", "dropChancePct": 100, "minQty": 8, "maxQty": 15 },
+        { "itemId": "mod_rare", "dropChancePct": 50, "minQty": 1, "maxQty": 1 },
+        { "itemId": "shard_energy", "dropChancePct": 30, "minQty": 1, "maxQty": 2 }
+      ]
+    },
+    "sceneName": "Mission_NeuralBreach",
+    "environment": { "shipType": "HeavyCruiser", "lighting": "Emergency", "atmosphere": "Toxic" }
+  },
+  {
+    "id": "void_lock",
+    "displayName": "VOID LOCK",
+    "description": "Tenir la station orbitale Hexgrid-9 pendant 8 minutes face à des vagues incessantes.",
+    "type": "Survival",
+    "region": "hexgrid9",
+    "recommendedPower": 3500,
+    "objectives": [
+      { "id": "vl_o1", "description": "Survivre 8 minutes", "kind": "Survive", "targetId": "timer", "requiredCount": 1, "rewardXp": 2000, "rewardCr": 1200 },
+      { "id": "vl_o2", "description": "Tenir la position centrale", "kind": "Defend", "targetId": "zone_center", "requiredCount": 1, "rewardXp": 1500, "rewardCr": 800 }
+    ],
+    "waves": [
+      { "id": "vl_w1", "delay": 0, "enemyId": "swarm_bot", "count": 8, "spawnPoint": { "x": 20, "y": 0, "z": 20 } },
+      { "id": "vl_w2", "delay": 60, "enemyId": "grunt_mk1", "count": 6, "spawnPoint": { "x": -20, "y": 0, "z": 20 } },
+      { "id": "vl_w3", "delay": 120, "enemyId": "assault_droid", "count": 5, "spawnPoint": { "x": 0, "y": 0, "z": -25 } },
+      { "id": "vl_w4", "delay": 180, "enemyId": "swarm_bot", "count": 12, "spawnPoint": { "x": 25, "y": 0, "z": -20 } },
+      { "id": "vl_w5", "delay": 240, "enemyId": "stealth_cloaker", "count": 4, "spawnPoint": { "x": -25, "y": 0, "z": -20 } },
+      { "id": "vl_w6", "delay": 300, "enemyId": "elite_guard", "count": 3, "spawnPoint": { "x": 0, "y": 0, "z": 25 } },
+      { "id": "vl_w7", "delay": 360, "enemyId": "sniper_drone", "count": 3, "spawnPoint": { "x": 30, "y": 8, "z": 0 } },
+      { "id": "vl_w8", "delay": 420, "enemyId": "heavy_unit", "count": 2, "spawnPoint": { "x": 0, "y": 0, "z": -30 } }
+    ],
+    "bossPhases": [],
+    "timeLimit": 480,
+    "stealthOptional": false,
+    "rewards": {
+      "xp": 3500,
+      "cr": 2000,
+      "lootTable": [
+        { "itemId": "ammo_kinetic", "dropChancePct": 100, "minQty": 10, "maxQty": 20 },
+        { "itemId": "mod_rare", "dropChancePct": 60, "minQty": 1, "maxQty": 2 },
+        { "itemId": "shard_energy", "dropChancePct": 40, "minQty": 1, "maxQty": 3 }
+      ]
+    },
+    "sceneName": "Mission_VoidLock",
+    "environment": { "shipType": "OrbitalStation", "lighting": "Neon", "atmosphere": "Vacuum" }
+  },
+  {
+    "id": "iron_harvest",
+    "displayName": "IRON HARVEST",
+    "description": "Pénétrer l'usine de drones Forge Epsilon et détruire le TITAN prototype en trois phases.",
+    "type": "Assassination",
+    "region": "forge_epsilon",
+    "recommendedPower": 4200,
+    "objectives": [
+      { "id": "ih_o1", "description": "Forcer l'entrée de l'usine", "kind": "Reach", "targetId": "factory_entrance", "requiredCount": 1, "rewardXp": 500, "rewardCr": 300 },
+      { "id": "ih_o2", "description": "Détruire les nids à drones", "kind": "Sabotage", "targetId": "drone_pod", "requiredCount": 4, "rewardXp": 1000, "rewardCr": 600 },
+      { "id": "ih_o3", "description": "Assassiner le TITAN", "kind": "Assassinate", "targetId": "boss_titan", "requiredCount": 1, "rewardXp": 3500, "rewardCr": 2100 }
+    ],
+    "waves": [
+      { "id": "ih_w1", "delay": 0, "enemyId": "swarm_bot", "count": 10, "spawnPoint": { "x": 20, "y": 0, "z": -10 } },
+      { "id": "ih_w2", "delay": 30, "enemyId": "assault_droid", "count": 5, "spawnPoint": { "x": -20, "y": 0, "z": -10 } },
+      { "id": "ih_w3", "delay": 60, "enemyId": "heavy_unit", "count": 2, "spawnPoint": { "x": 0, "y": 0, "z": -20 } },
+      { "id": "ih_w4", "delay": 90, "enemyId": "elite_guard", "count": 3, "spawnPoint": { "x": 15, "y": 0, "z": -25 } }
+    ],
+    "bossPhases": [
+      { "id": "ih_bp1", "phase": 1, "enemyId": "boss_titan", "healthThresholdPct": 0.66, "enrageTimer": 0, "description": "Phase 1 : TITAN en posture défensive, déploiement de drones." },
+      { "id": "ih_bp2", "phase": 2, "enemyId": "boss_titan", "healthThresholdPct": 0.33, "enrageTimer": 0, "description": "Phase 2 : TITAN enrage, attaques de zone accrues." },
+      { "id": "ih_bp3", "phase": 3, "enemyId": "boss_titan", "healthThresholdPct": 0.0, "enrageTimer": 120, "description": "Phase 3 : enrage définitif, timer 2min." }
+    ],
+    "timeLimit": 0,
+    "stealthOptional": false,
+    "rewards": {
+      "xp": 5000,
+      "cr": 3000,
+      "lootTable": [
+        { "itemId": "core_legendary", "dropChancePct": 100, "minQty": 1, "maxQty": 1 },
+        { "itemId": "mod_epic", "dropChancePct": 70, "minQty": 1, "maxQty": 2 },
+        { "itemId": "cr_large", "dropChancePct": 100, "minQty": 3, "maxQty": 6 }
+      ]
+    },
+    "sceneName": "Mission_IronHarvest",
+    "environment": { "shipType": "DroneFactory", "lighting": "Industrial", "atmosphere": "Steam" }
+  },
+  {
+    "id": "deep_signal",
+    "displayName": "DEEP SIGNAL",
+    "description": "Explorer l'épave Voidlight et récupérer 3 points de données. Discrétion recommandée.",
+    "type": "Recon",
+    "region": "voidlight",
+    "recommendedPower": 3800,
+    "objectives": [
+      { "id": "ds_o1", "description": "Infiltrer l'épave", "kind": "Reach", "targetId": "wreck_entrance", "requiredCount": 1, "rewardXp": 600, "rewardCr": 300 },
+      { "id": "ds_o2", "description": "Scanner les points de données", "kind": "Scan", "targetId": "data_node", "requiredCount": 3, "rewardXp": 1800, "rewardCr": 1000 },
+      { "id": "ds_o3", "description": "Exfiltrer en toute discrétion", "kind": "Extract", "targetId": "exfil_point", "requiredCount": 1, "rewardXp": 1600, "rewardCr": 900 }
+    ],
+    "waves": [
+      { "id": "ds_w1", "delay": 0, "enemyId": "stealth_cloaker", "count": 3, "spawnPoint": { "x": 15, "y": 0, "z": -10 } },
+      { "id": "ds_w2", "delay": 45, "enemyId": "sniper_drone", "count": 2, "spawnPoint": { "x": -20, "y": 6, "z": -15 } },
+      { "id": "ds_w3", "delay": 90, "enemyId": "stealth_cloaker", "count": 4, "spawnPoint": { "x": 0, "y": 0, "z": -20 } }
+    ],
+    "bossPhases": [],
+    "timeLimit": 0,
+    "stealthOptional": true,
+    "rewards": {
+      "xp": 4000,
+      "cr": 2200,
+      "lootTable": [
+        { "itemId": "mod_stealth", "dropChancePct": 50, "minQty": 1, "maxQty": 1 },
+        { "itemId": "shard_energy", "dropChancePct": 60, "minQty": 2, "maxQty": 4 },
+        { "itemId": "optics_scope", "dropChancePct": 30, "minQty": 1, "maxQty": 1 }
+      ]
+    },
+    "sceneName": "Mission_DeepSignal",
+    "environment": { "shipType": "Derelict", "lighting": "Dim", "atmosphere": "Smoke" }
+  },
+  {
+    "id": "black_echo",
+    "displayName": "BLACK ECHO",
+    "description": "Défendre le relais de communication du porte-vaisseaux Achlys Vanguard contre 10 vagues d'assaut.",
+    "type": "Defense",
+    "region": "achlys",
+    "recommendedPower": 4800,
+    "objectives": [
+      { "id": "be_o1", "description": "Défendre le relais", "kind": "Defend", "targetId": "comm_relay", "requiredCount": 1, "rewardXp": 2500, "rewardCr": 1500 },
+      { "id": "be_o2", "description": "Survivre aux 10 vagues", "kind": "Survive", "targetId": "wave_counter", "requiredCount": 10, "rewardXp": 2000, "rewardCr": 1200 },
+      { "id": "be_o3", "description": "Réparer le relais endommagé", "kind": "Escort", "targetId": "repair_bot", "requiredCount": 1, "rewardXp": 1500, "rewardCr": 800 }
+    ],
+    "waves": [
+      { "id": "be_w1", "delay": 0, "enemyId": "grunt_mk1", "count": 6, "spawnPoint": { "x": 25, "y": 0, "z": 25 } },
+      { "id": "be_w2", "delay": 40, "enemyId": "assault_droid", "count": 5, "spawnPoint": { "x": -25, "y": 0, "z": 25 } },
+      { "id": "be_w3", "delay": 80, "enemyId": "swarm_bot", "count": 10, "spawnPoint": { "x": 0, "y": 0, "z": 30 } },
+      { "id": "be_w4", "delay": 120, "enemyId": "stealth_cloaker", "count": 4, "spawnPoint": { "x": 30, "y": 0, "z": -20 } },
+      { "id": "be_w5", "delay": 160, "enemyId": "elite_guard", "count": 3, "spawnPoint": { "x": -30, "y": 0, "z": -20 } },
+      { "id": "be_w6", "delay": 200, "enemyId": "heavy_unit", "count": 2, "spawnPoint": { "x": 0, "y": 0, "z": 30 } },
+      { "id": "be_w7", "delay": 240, "enemyId": "sniper_drone", "count": 4, "spawnPoint": { "x": 35, "y": 8, "z": 0 } },
+      { "id": "be_w8", "delay": 280, "enemyId": "assault_droid", "count": 8, "spawnPoint": { "x": -25, "y": 0, "z": 30 } },
+      { "id": "be_w9", "delay": 320, "enemyId": "swarm_bot", "count": 15, "spawnPoint": { "x": 0, "y": 0, "z": 35 } },
+      { "id": "be_w10", "delay": 360, "enemyId": "heavy_unit", "count": 3, "spawnPoint": { "x": 0, "y": 0, "z": 35 } }
+    ],
+    "bossPhases": [],
+    "timeLimit": 0,
+    "stealthOptional": false,
+    "rewards": {
+      "xp": 6000,
+      "cr": 3500,
+      "lootTable": [
+        { "itemId": "mod_epic", "dropChancePct": 70, "minQty": 1, "maxQty": 2 },
+        { "itemId": "ammo_kinetic", "dropChancePct": 100, "minQty": 15, "maxQty": 30 },
+        { "itemId": "shard_energy", "dropChancePct": 50, "minQty": 2, "maxQty": 5 }
+      ]
+    },
+    "sceneName": "Mission_BlackEcho",
+    "environment": { "shipType": "Carrier", "lighting": "Storm", "atmosphere": "VoidStorm" }
+  },
+  {
+    "id": "final_vector",
+    "displayName": "FINAL VECTOR",
+    "description": "Assaut final sur le vaisseau amiral Overlord Prime. Trois phases de boss consécutives.",
+    "type": "BossRush",
+    "region": "overlord_prime",
+    "recommendedPower": 6000,
+    "objectives": [
+      { "id": "fv_o1", "description": "Vaincre le Noyau Neural", "kind": "Assassinate", "targetId": "boss_neural_core", "requiredCount": 1, "rewardXp": 4000, "rewardCr": 2500 },
+      { "id": "fv_o2", "description": "Vaincre l'Interceptor", "kind": "Assassinate", "targetId": "boss_interceptor", "requiredCount": 1, "rewardXp": 4000, "rewardCr": 2500 },
+      { "id": "fv_o3", "description": "Vaincre l'Overlord", "kind": "Assassinate", "targetId": "boss_overlord", "requiredCount": 1, "rewardXp": 4000, "rewardCr": 3000 }
+    ],
+    "waves": [
+      { "id": "fv_w1", "delay": 0, "enemyId": "elite_guard", "count": 4, "spawnPoint": { "x": 20, "y": 0, "z": -15 } },
+      { "id": "fv_w2", "delay": 30, "enemyId": "assault_droid", "count": 6, "spawnPoint": { "x": -20, "y": 0, "z": -15 } },
+      { "id": "fv_w3", "delay": 60, "enemyId": "heavy_unit", "count": 2, "spawnPoint": { "x": 0, "y": 0, "z": -25 } }
+    ],
+    "bossPhases": [
+      { "id": "fv_bp1", "phase": 1, "enemyId": "boss_neural_core", "healthThresholdPct": 0.0, "enrageTimer": 180, "description": "Phase 1 : Noyau Neural défensif, vagues de drones." },
+      { "id": "fv_bp2", "phase": 2, "enemyId": "boss_interceptor", "healthThresholdPct": 0.0, "enrageTimer": 150, "description": "Phase 2 : Interceptor hyper-mobile, attaques rapides." },
+      { "id": "fv_bp3", "phase": 3, "enemyId": "boss_overlord", "healthThresholdPct": 0.0, "enrageTimer": 240, "description": "Phase 3 : Overlord final, enrage progressif." }
+    ],
+    "timeLimit": 0,
+    "stealthOptional": false,
+    "rewards": {
+      "xp": 12000,
+      "cr": 8000,
+      "lootTable": [
+        { "itemId": "core_legendary", "dropChancePct": 100, "minQty": 3, "maxQty": 5 },
+        { "itemId": "relic_overlord", "dropChancePct": 100, "minQty": 1, "maxQty": 1 },
+        { "itemId": "cr_large", "dropChancePct": 100, "minQty": 10, "maxQty": 20 }
+      ]
+    },
+    "sceneName": "Mission_FinalVector",
+    "environment": { "shipType": "Flagship", "lighting": "Void", "atmosphere": "VoidStorm" }
+  }
+]

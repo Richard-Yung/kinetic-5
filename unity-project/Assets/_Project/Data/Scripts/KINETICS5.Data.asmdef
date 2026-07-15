@@ -1,0 +1,17 @@
+{
+    "name": "KINETICS5.Data",
+    "rootNamespace": "KINETICS5.Data",
+    "references": [
+        "KINETICS5.Core",
+        "Newtonsoft.Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,29 @@
+{
+    "scopedRegistries": [
+        {
+            "name": "OpenUPM",
+            "url": "https://package.openupm.com",
+            "scopes": [
+                "com.cysharp",
+                "com.demigiant"
+            ]
+        }
+    ],
+    "dependencies": {
+        "com.cysharp.unitask": "2.5.10",
+        "com.demigiant.dotween": "1.2.745",
+        "com.unity.addressables": "2.2.2",
+        "com.unity.cinemachine": "3.1.1",
+        "com.unity.inputsystem": "1.11.2",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.render-pipelines.core": "17.0.3",
+        "com.unity.render-pipelines.universal": "17.0.3",
+        "com.unity.shadergraph": "17.0.3",
+        "com.unity.ugui": "2.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0",
+        "com.unity.modules.ui": "1.0.0"
+    }
+}

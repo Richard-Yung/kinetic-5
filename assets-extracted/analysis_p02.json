@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**KINETICS 5 Start/Loading Screen UI:**  \n- **Background:** Dark, sci-fi space theme with a planet, debris, and starships (top) and a futuristic armored character (bottom).  \n- **Logo:** \"KINETICS 5\" in sleek, futuristic font (top section).  \n- **Menu Buttons:** \"NEW GAME\" (blue, prominent), \"CONTINUE\", \"LOAD GAME\", \"OPTIONS\", \"QUIT\" (white text, horizontal row below logo).  \n- **Layout:** Two mobile screen previews: Top = Start screen (logo + buttons); Bottom = Loading screen (character, progress bar at 55%, loading text).  \n\nConcise, sci-fi aesthetic with clear, functional UI elements.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1784069837,
+  "id": "2026071506571225a9d1119aa0410a",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "2026071506571225a9d1119aa0410a",
+  "usage": {
+    "completion_tokens": 155,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2619,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2774
+  }
+}

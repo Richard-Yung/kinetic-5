@@ -3,11 +3,39 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   KINETICS 5 — Design System (palette extraite du PDF page 8)
+   Palette NON-NÉGOCIABLE :
+   - Main  : #1AA1CE (cyan)
+   - Sub   : #6CF42E (vert), #FFE735 (jaune), #FE0022 (rouge)
+   - Dark  : #10204B (bleu nuit), #05060F (deep space)
+   - White : #FFFFFF
+   Typo : Audiowide (titres/boutons/nombres), Rajdhani (corps)
+   ============================================================ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-rajdhani);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-audiowide);
+
+  --color-k5-cyan: #1AA1CE;
+  --color-k5-cyan-glow: #4FC8E8;
+  --color-k5-cyan-dark: #0E6B85;
+  --color-k5-green: #6CF42E;
+  --color-k5-yellow: #FFE735;
+  --color-k5-red: #FE0022;
+  --color-k5-dark-blue: #10204B;
+  --color-k5-deep-space: #05060F;
+  --color-k5-panel: #0A1929;
+  --color-k5-panel-light: #0F2B4A;
+  --color-k5-border: #1A4A6E;
+  --color-k5-muted: #6B8CAE;
+  --color-k5-orange: #FF8C00;
+  --color-k5-gold: #FFD700;
+  --color-k5-purple: #A855F7;
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,79 +72,232 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --radius: 0.375rem;
+  /* Fond espace profond — toujours sombre pour le thème sci-fi */
+  --background: #05060F;
+  --foreground: #FFFFFF;
+  --card: #0A1929;
+  --card-foreground: #FFFFFF;
+  --popover: #0A1929;
+  --popover-foreground: #FFFFFF;
+  --primary: #1AA1CE;
+  --primary-foreground: #05060F;
+  --secondary: #10204B;
+  --secondary-foreground: #FFFFFF;
+  --muted: #0F2B4A;
+  --muted-foreground: #6B8CAE;
+  --accent: #1AA1CE;
+  --accent-foreground: #05060F;
+  --destructive: #FE0022;
+  --border: #1A4A6E;
+  --input: #1A4A6E;
+  --ring: #1AA1CE;
+  --chart-1: #1AA1CE;
+  --chart-2: #6CF42E;
+  --chart-3: #FFE735;
+  --chart-4: #FE0022;
+  --chart-5: #A855F7;
+  --sidebar: #0A1929;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #1AA1CE;
+  --sidebar-primary-foreground: #05060F;
+  --sidebar-accent: #10204B;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #1A4A6E;
+  --sidebar-ring: #1AA1CE;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+  html, body {
+    background: #05060F;
+    color: #FFFFFF;
+    font-family: var(--font-rajdhani), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
   }
   body {
-    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse at top, rgba(26, 161, 206, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(16, 32, 75, 0.4) 0%, transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 }
+
+/* ============================================================
+   Composants utilitaires KINETICS 5
+   ============================================================ */
+
+/* Texte Audiowide — titres, boutons, chiffres */
+.font-display {
+  font-family: var(--font-audiowide), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Panneau sci-fi avec bordure cyan et fond dégradé */
+.k5-panel {
+  background: linear-gradient(135deg, rgba(10, 25, 41, 0.95) 0%, rgba(15, 43, 74, 0.85) 100%);
+  border: 1px solid rgba(26, 161, 206, 0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  position: relative;
+}
+.k5-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(26, 161, 206, 0.6), transparent 50%, rgba(26, 161, 206, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Coins sci-fi (clips angulaires) */
+.k5-clip {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.k5-clip-sm {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* Lueur cyan */
+.k5-glow-cyan {
+  box-shadow: 0 0 20px rgba(26, 161, 206, 0.4), 0 0 40px rgba(26, 161, 206, 0.2);
+}
+.k5-glow-green {
+  box-shadow: 0 0 20px rgba(108, 244, 46, 0.4);
+}
+.k5-glow-red {
+  box-shadow: 0 0 20px rgba(254, 0, 34, 0.4);
+}
+.k5-glow-yellow {
+  box-shadow: 0 0 20px rgba(255, 231, 53, 0.4);
+}
+
+/* Texte avec lueur */
+.k5-text-glow-cyan {
+  text-shadow: 0 0 10px rgba(26, 161, 206, 0.8), 0 0 20px rgba(26, 161, 206, 0.4);
+}
+.k5-text-glow-green {
+  text-shadow: 0 0 10px rgba(108, 244, 46, 0.8);
+}
+.k5-text-glow-red {
+  text-shadow: 0 0 10px rgba(254, 0, 34, 0.8);
+}
+
+/* Grille de fond sci-fi */
+.k5-grid-bg {
+  background-image:
+    linear-gradient(rgba(26, 161, 206, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 161, 206, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Scanlines subtiles (effet HUD) */
+.k5-scanlines {
+  position: relative;
+}
+.k5-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(26, 161, 206, 0.03) 2px,
+    rgba(26, 161, 206, 0.03) 3px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Barre de progression segmentée (style PDF page 4-5) */
+.k5-segmented-bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  width: 100%;
+}
+.k5-segmented-bar > .segment {
+  flex: 1;
+  background: rgba(26, 74, 110, 0.5);
+  border-radius: 1px;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.k5-segmented-bar > .segment.filled {
+  background: var(--bar-color, #1AA1CE);
+  box-shadow: 0 0 4px var(--bar-color, #1AA1CE);
+}
+
+/* Animation pulse cyan (bouton PLAY, éléments importants) */
+@keyframes k5-pulse-cyan {
+  0%, 100% { box-shadow: 0 0 20px rgba(26, 161, 206, 0.6), 0 0 40px rgba(26, 161, 206, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(26, 161, 206, 0.9), 0 0 60px rgba(26, 161, 206, 0.5); }
+}
+.k5-pulse {
+  animation: k5-pulse-cyan 2s ease-in-out infinite;
+}
+
+/* Animation scan horizontale (loading) */
+@keyframes k5-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.k5-scan {
+  animation: k5-scan 1.5s linear infinite;
+}
+
+/* Glitch text effect */
+@keyframes k5-glitch {
+  0%, 100% { transform: translate(0); text-shadow: 0 0 10px rgba(26, 161, 206, 0.8); }
+  20% { transform: translate(-1px, 1px); text-shadow: -2px 0 #FE0022, 2px 0 #1AA1CE; }
+  40% { transform: translate(1px, -1px); text-shadow: 2px 0 #FE0022, -2px 0 #1AA1CE; }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+}
+.k5-glitch:hover {
+  animation: k5-glitch 0.3s ease-in-out;
+}
+
+/* Twinkling stars background */
+@keyframes k5-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+/* Scrollbar custom (style sci-fi) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #05060F;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A4A6E;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1AA1CE;
+}
+
+/* Désactive la sélection de texte sur les contrôles de jeu */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Safe area mobile (notch) */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left { padding-left: env(safe-area-inset-left); }
+.safe-right { padding-right: env(safe-area-inset-right); }

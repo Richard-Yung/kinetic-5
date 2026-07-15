@@ -1,0 +1,34 @@
+{
+    "name": "KINETICS5.Network",
+    "rootNamespace": "KINETICS5.Network",
+    "references": [
+        "KINETICS5.Core",
+        "KINETICS5.Data",
+        "Newtonsoft.Json",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "UniTask.dll",
+        "Nakama.dll",
+        "Nakama.Unity.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER"
+    ],
+    "versionDefines": [
+        {
+            "name": "Nakama",
+            "expression": "1.0.0",
+            "defines": [
+                "KINETICS_NAKAMA"
+            ]
+        }
+    ],
+    "noEngineReferences": false
+}

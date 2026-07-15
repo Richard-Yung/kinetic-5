@@ -1,0 +1,47 @@
+{
+    "name": "KINETICS5.Core",
+    "rootNamespace": "KINETICS5.Core",
+    "references": [
+        "UniTask",
+        "Cinemachine",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.Addressables",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.ResourceManager",
+        "DOTween"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "UniTask.dll",
+        "UniTask.Linq.dll",
+        "FMODUnity.dll",
+        "FMODUnityResonanceRuntime.dll",
+        "Demigiant.DOTween.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER"
+    ],
+    "versionDefines": [
+        {
+            "name": "FMODUnity",
+            "expression": "1.0.0",
+            "defines": [
+                "KINETICS_FMOD"
+            ]
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "1.21.0",
+            "defines": [
+                "KINETICS_ADDRESSABLES"
+            ]
+        }
+    ],
+    "noEngineReferences": false
+}

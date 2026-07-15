@@ -1,0 +1,32 @@
+{
+    "name": "KINETICS5.UI",
+    "rootNamespace": "KINETICS5.UI",
+    "references": [
+        "KINETICS5.Core",
+        "KINETICS5.Data",
+        "UniTask",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.Addressables",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.ugui",
+        "DOTween",
+        "Newtonsoft.Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "UniTask.dll",
+        "UniTask.Linq.dll",
+        "Newtonsoft.Json.dll",
+        "Demigiant.DOTween.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

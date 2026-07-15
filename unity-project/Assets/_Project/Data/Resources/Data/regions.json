@@ -1,0 +1,72 @@
+[
+  {
+    "id": "tarnhelm",
+    "displayName": "MV Tarnhelm",
+    "description": "Cargo marchand converti au fret militaire. compartiments étroits, éclairage minimal.",
+    "sceneName": "Region_Tarnhelm",
+    "recommendedLevel": 1,
+    "missions": ["shadow_fall"],
+    "ambientColor": "#1AA1CE",
+    "environment": { "shipType": "CargoShip", "lighting": "Dim", "atmosphere": "Vacuum" }
+  },
+  {
+    "id": "kriegsonde",
+    "displayName": "Kriegsonde",
+    "description": "Croiseur lourd de la flotte noire. Couloirs blindés, éclairage d'urgence rouge.",
+    "sceneName": "Region_Kriegsonde",
+    "recommendedLevel": 8,
+    "missions": ["neural_breach"],
+    "ambientColor": "#FE0022",
+    "environment": { "shipType": "HeavyCruiser", "lighting": "Emergency", "atmosphere": "Toxic" }
+  },
+  {
+    "id": "hexgrid9",
+    "displayName": "Hexgrid-9",
+    "description": "Station orbitale automatisée. Architecture néon, baies d'amarrage ouvertes sur le vide.",
+    "sceneName": "Region_Hexgrid9",
+    "recommendedLevel": 15,
+    "missions": ["void_lock"],
+    "ambientColor": "#1AA1CE",
+    "environment": { "shipType": "OrbitalStation", "lighting": "Neon", "atmosphere": "Vacuum" }
+  },
+  {
+    "id": "forge_epsilon",
+    "displayName": "Forge Epsilon",
+    "description": "Usine de production de drones. Chaînes d'assemblage, vapeur et bruit industriel.",
+    "sceneName": "Region_ForgeEpsilon",
+    "recommendedLevel": 22,
+    "missions": ["iron_harvest"],
+    "ambientColor": "#FFE735",
+    "environment": { "shipType": "DroneFactory", "lighting": "Industrial", "atmosphere": "Steam" }
+  },
+  {
+    "id": "voidlight",
+    "displayName": "Voidlight Wreck",
+    "description": "Épave dérivante d'un vaisseau de recherche. Sombres coursives envahies de fumée.",
+    "sceneName": "Region_Voidlight",
+    "recommendedLevel": 18,
+    "missions": ["deep_signal"],
+    "ambientColor": "#6CF42E",
+    "environment": { "shipType": "Derelict", "lighting": "Dim", "atmosphere": "Smoke" }
+  },
+  {
+    "id": "achlys",
+    "displayName": "Achlys Vanguard",
+    "description": "Porte-vaisseaux d'assaut. Ponts vastes, tempête électromagnétique permanente.",
+    "sceneName": "Region_Achlys",
+    "recommendedLevel": 28,
+    "missions": ["black_echo"],
+    "ambientColor": "#FE0022",
+    "environment": { "shipType": "Carrier", "lighting": "Storm", "atmosphere": "VoidStorm" }
+  },
+  {
+    "id": "overlord_prime",
+    "displayName": "Overlord Prime",
+    "description": "Vaisseau amiral de la flotte ennemie. Cœur du pouvoir, défenses ultimes.",
+    "sceneName": "Region_OverlordPrime",
+    "recommendedLevel": 40,
+    "missions": ["final_vector"],
+    "ambientColor": "#10204B",
+    "environment": { "shipType": "Flagship", "lighting": "Void", "atmosphere": "VoidStorm" }
+  }
+]

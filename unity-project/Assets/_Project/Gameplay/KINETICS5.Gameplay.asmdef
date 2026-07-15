@@ -1,0 +1,29 @@
+{
+    "name": "KINETICS5.Gameplay",
+    "rootNamespace": "KINETICS5.Gameplay",
+    "references": [
+        "KINETICS5.Core",
+        "KINETICS5.Data",
+        "KINETICS5.UI",
+        "Newtonsoft.Json",
+        "UniTask",
+        "Cinemachine",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "UniTask.dll",
+        "Demigiant.DOTween.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_6000_0_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

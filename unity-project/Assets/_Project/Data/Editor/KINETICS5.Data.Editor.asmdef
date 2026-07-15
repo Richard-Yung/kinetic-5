@@ -1,0 +1,20 @@
+{
+    "name": "KINETICS5.Data.Editor",
+    "rootNamespace": "KINETICS5.Data.Editor",
+    "references": [
+        "KINETICS5.Data",
+        "KINETICS5.Core",
+        "Newtonsoft.Json"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

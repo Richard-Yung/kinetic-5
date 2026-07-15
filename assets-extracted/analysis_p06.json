@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**HUD Layout**: Bottom-centered vitals (health/armor) + top-right weapon/ammo; left-side collapsible minimap.  \n\n**Health/Armor/Ammo**:  \n- Health (green bar) & Armor (blue bar) at bottom center, flanking a central timer (12:39).  \n- Ammo (135/135) top-right, with weapon icon (\"RIFLE\") and reload/clip counts (9/3) below.  \n\n**Minimap**: Top-left, collapsible (\"HIDE MAP\" toggle), tactical tracking with green markers.  \n\n**Controls**: Bottom-left (movement pad), bottom-right (action buttons: fire, grenade).  \n\n**Colors**: High-contrast (green health, blue armor, white text) on dark UI; neon blue accents for interactive elements.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1784069831,
+  "id": "20260715065705dd7f23fffe414c01",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260715065705dd7f23fffe414c01",
+  "usage": {
+    "completion_tokens": 167,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2627,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2794
+  }
+}

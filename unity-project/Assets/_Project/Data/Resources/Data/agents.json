@@ -1,0 +1,338 @@
+[
+  {
+    "id": "vulcan",
+    "displayName": "VULCAN",
+    "class": "Tank",
+    "unlockLevel": 1,
+    "level": 47,
+    "description": "Heavy suppression operative. The use of experimental alloys has pushed Vulcan's defense to the absolute limit at the cost of maneuverability.",
+    "motto": "The Wall Never Retreats",
+    "portrait": "Sprites/Agents/vulcan_portrait",
+    "modelPrefab": "Prefabs/Agents/Vulcan",
+    "baseHealth": 5000,
+    "baseShield": 2500,
+    "baseSpeed": 0.6,
+    "basePower": 2500,
+    "themeColor": "#1AA1CE",
+    "abilities": [
+      {
+        "id": "vulcan_aegis",
+        "name": "AEGIS BULWARK",
+        "description": "Déploie un bouclier cinétique absorbant 4000 dégâts pendant 6s.",
+        "cooldown": 18,
+        "effectType": "Shield",
+        "magnitude": 4000
+      },
+      {
+        "id": "vulcan_slam",
+        "name": "SEISMIC SLAM",
+        "description": "Frappe au sol infligeant 1500 dégâts de zone et repoussant les ennemis proches.",
+        "cooldown": 12,
+        "effectType": "Knockback",
+        "magnitude": 1500
+      },
+      {
+        "id": "vulcan_ult",
+        "name": "TITAN PROTOCOL",
+        "description": "Ultimate : réduit les dégâts subis de 70% pendant 8s et régénère 500 PV/s.",
+        "cooldown": 60,
+        "effectType": "DamageReduction",
+        "magnitude": 0.7
+      }
+    ],
+    "awakeningTree": [
+      {
+        "id": "vulcan_t1",
+        "name": "Plating Renforcé",
+        "description": "+500 PV max.",
+        "type": "Stat",
+        "cost": 1,
+        "requiredNodeIds": [],
+        "effectType": "Heal",
+        "magnitude": 500
+      },
+      {
+        "id": "vulcan_t2",
+        "name": "Aegis Amplifié",
+        "description": "+1500 absorption au bouclier Aegis.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["vulcan_t1"],
+        "effectType": "Shield",
+        "magnitude": 1500
+      },
+      {
+        "id": "vulcan_t3",
+        "name": "Réflexes Lourds",
+        "description": "+0.15 vitesse de déplacement.",
+        "type": "Stat",
+        "cost": 2,
+        "requiredNodeIds": ["vulcan_t1"],
+        "effectType": "SpeedBuff",
+        "magnitude": 0.15
+      },
+      {
+        "id": "vulcan_t4",
+        "name": "Titan Perpétuel",
+        "description": "Réduit le cooldown de Titan Protocol de 15s.",
+        "type": "Ultimate",
+        "cost": 3,
+        "requiredNodeIds": ["vulcan_t2", "vulcan_t3"],
+        "effectType": "DamageReduction",
+        "magnitude": 0.15
+      }
+    ]
+  },
+  {
+    "id": "xen",
+    "displayName": "XEN",
+    "class": "Assault",
+    "unlockLevel": 55,
+    "level": 1,
+    "description": "High-mobility assault operative. Plasma-infused strikes shred armor.",
+    "motto": "Strike First, Strike Hard",
+    "portrait": "Sprites/Agents/xen_portrait",
+    "modelPrefab": "Prefabs/Agents/Xen",
+    "baseHealth": 3500,
+    "baseShield": 1500,
+    "baseSpeed": 1.2,
+    "basePower": 2400,
+    "themeColor": "#FE0022",
+    "abilities": [
+      {
+        "id": "xen_dash",
+        "name": "PHASE DASH",
+        "description": "Dash instantané de 12m traversant les ennemis, infligeant 800 dégâts énergie.",
+        "cooldown": 8,
+        "effectType": "Damage",
+        "magnitude": 800
+      },
+      {
+        "id": "xen_plasma",
+        "name": "PLASMA VOLLEY",
+        "description": "Salve de 5 projectiles plasma infligeant 600 dégâts chacun + brûlure 3s.",
+        "cooldown": 14,
+        "effectType": "DamageOverTime",
+        "magnitude": 3000
+      },
+      {
+        "id": "xen_ult",
+        "name": "OVERDRIVE",
+        "description": "Ultimate : +40% cadence de tir et +50% dégâts pendant 10s.",
+        "cooldown": 55,
+        "effectType": "Damage",
+        "magnitude": 0.5
+      }
+    ],
+    "awakeningTree": [
+      {
+        "id": "xen_t1",
+        "name": "Réacteurs Tuning",
+        "description": "+0.2 vitesse de déplacement.",
+        "type": "Stat",
+        "cost": 1,
+        "requiredNodeIds": [],
+        "effectType": "SpeedBuff",
+        "magnitude": 0.2
+      },
+      {
+        "id": "xen_t2",
+        "name": "Phase Profonde",
+        "description": "Phase Dash gagne 4s de réduction de dégâts après usage.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["xen_t1"],
+        "effectType": "DamageReduction",
+        "magnitude": 0.3
+      },
+      {
+        "id": "xen_t3",
+        "name": "Plasma Surcharge",
+        "description": "Plasma Volley tire 8 projectiles au lieu de 5.",
+        "type": "Ability",
+        "cost": 3,
+        "requiredNodeIds": ["xen_t2"],
+        "effectType": "DamageOverTime",
+        "magnitude": 4800
+      },
+      {
+        "id": "xen_t4",
+        "name": "Overdrive Perpétuel",
+        "description": "+4s à la durée d'Overdrive.",
+        "type": "Ultimate",
+        "cost": 3,
+        "requiredNodeIds": ["xen_t3"],
+        "effectType": "Damage",
+        "magnitude": 0.1
+      }
+    ]
+  },
+  {
+    "id": "jolt",
+    "displayName": "JOLT",
+    "class": "Support",
+    "unlockLevel": 1,
+    "level": 1,
+    "description": "Field medic and EMP specialist. Sustains the squad and disables tech.",
+    "motto": "Stay Charged, Stay Alive",
+    "portrait": "Sprites/Agents/jolt_portrait",
+    "modelPrefab": "Prefabs/Agents/Jolt",
+    "baseHealth": 3000,
+    "baseShield": 2000,
+    "baseSpeed": 1.0,
+    "basePower": 2300,
+    "themeColor": "#FFE735",
+    "abilities": [
+      {
+        "id": "jolt_pulse",
+        "name": "NANO PULSE",
+        "description": "Soin de zone 1200 PV aux alliés dans un rayon de 8m.",
+        "cooldown": 10,
+        "effectType": "Heal",
+        "magnitude": 1200
+      },
+      {
+        "id": "jolt_emp",
+        "name": "EMP BURST",
+        "description": "Désactive la tech ennemie et étourdit 2s dans un rayon de 10m.",
+        "cooldown": 16,
+        "effectType": "EMP",
+        "magnitude": 2
+      },
+      {
+        "id": "jolt_ult",
+        "name": "REANID GRID",
+        "description": "Ultimate : pose un puits de soin régénérant 300 PV/s pendant 12s (rayon 12m).",
+        "cooldown": 60,
+        "effectType": "Heal",
+        "magnitude": 300
+      }
+    ],
+    "awakeningTree": [
+      {
+        "id": "jolt_t1",
+        "name": "Batterie étendue",
+        "description": "+500 bouclier max.",
+        "type": "Stat",
+        "cost": 1,
+        "requiredNodeIds": [],
+        "effectType": "Shield",
+        "magnitude": 500
+      },
+      {
+        "id": "jolt_t2",
+        "name": "Nano renforcé",
+        "description": "Nano Pulse soigne +600 PV.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["jolt_t1"],
+        "effectType": "Heal",
+        "magnitude": 1800
+      },
+      {
+        "id": "jolt_t3",
+        "name": "EMP à large bande",
+        "description": "EMP Burst rayon +6m et stun +1s.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["jolt_t1"],
+        "effectType": "Stun",
+        "magnitude": 3
+      },
+      {
+        "id": "jolt_t4",
+        "name": "Reanid surchargé",
+        "description": "Reanid Grid dure 18s au lieu de 12s.",
+        "type": "Ultimate",
+        "cost": 3,
+        "requiredNodeIds": ["jolt_t2", "jolt_t3"],
+        "effectType": "Heal",
+        "magnitude": 400
+      }
+    ]
+  },
+  {
+    "id": "xano",
+    "displayName": "XANO",
+    "class": "Recon",
+    "unlockLevel": 55,
+    "level": 1,
+    "description": "Stealth infiltrator. Silent takedowns and recon data.",
+    "motto": "Seen Too Late",
+    "portrait": "Sprites/Agents/xano_portrait",
+    "modelPrefab": "Prefabs/Agents/Xano",
+    "baseHealth": 2800,
+    "baseShield": 1200,
+    "baseSpeed": 1.3,
+    "basePower": 2350,
+    "themeColor": "#6CF42E",
+    "abilities": [
+      {
+        "id": "xano_cloak",
+        "name": "PHANTOM CLOAK",
+        "description": "Furtivité 6s : invisibilité aux ennemis, +200% dégâts au premier tir sortant.",
+        "cooldown": 15,
+        "effectType": "Cloak",
+        "magnitude": 2
+      },
+      {
+        "id": "xano_mark",
+        "name": "RECON TAG",
+        "description": "Marque un ennemi : +30% dégâts subis pendant 8s et révélation sur minimap.",
+        "cooldown": 9,
+        "effectType": "DamageOverTime",
+        "magnitude": 0.3
+      },
+      {
+        "id": "xano_ult",
+        "name": "VOID ASSASSIN",
+        "description": "Ultimate : téléportation sur cible marquée + 2500 dégâts cryo + gel 2s.",
+        "cooldown": 50,
+        "effectType": "Damage",
+        "magnitude": 2500
+      }
+    ],
+    "awakeningTree": [
+      {
+        "id": "xano_t1",
+        "name": "Semelles silencieuses",
+        "description": "+0.2 vitesse en furtif.",
+        "type": "Stat",
+        "cost": 1,
+        "requiredNodeIds": [],
+        "effectType": "SpeedBuff",
+        "magnitude": 0.2
+      },
+      {
+        "id": "xano_t2",
+        "name": "Cloak prolongé",
+        "description": "Phantom Cloak dure 9s au lieu de 6s.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["xano_t1"],
+        "effectType": "Cloak",
+        "magnitude": 2.5
+      },
+      {
+        "id": "xano_t3",
+        "name": "Tag multiple",
+        "description": "Recon Tag peut marquer 3 cibles simultanément.",
+        "type": "Ability",
+        "cost": 2,
+        "requiredNodeIds": ["xano_t1"],
+        "effectType": "DamageOverTime",
+        "magnitude": 0.4
+      },
+      {
+        "id": "xano_t4",
+        "name": "Assassin réitérant",
+        "description": "Void Assassin reset son cooldown sur kill.",
+        "type": "Ultimate",
+        "cost": 3,
+        "requiredNodeIds": ["xano_t2", "xano_t3"],
+        "effectType": "Damage",
+        "magnitude": 3000
+      }
+    ]
+  }
+]
