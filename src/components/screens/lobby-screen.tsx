@@ -20,7 +20,13 @@ export function LobbyScreen() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex flex-col bg-k5-deep-space">
-      <StarfieldBackground density={40} />
+      {/* Fond vaisseau */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-30"
+        style={{ backgroundImage: "url(/kinetics/ship-interior.png)" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/70 via-k5-deep-space/80 to-k5-deep-space" />
+      <StarfieldBackground density={30} />
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 py-3 safe-top border-b border-k5-border/50 bg-k5-panel/40 backdrop-blur-sm">

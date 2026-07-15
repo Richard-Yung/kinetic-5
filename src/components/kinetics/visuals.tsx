@@ -69,8 +69,7 @@ export function StarfieldBackground({
 }
 
 /* ============================================================
-   AgentAvatar — silhouette d'agent stylisée (SVG)
-   Représentation sci-fi codée par classe + couleur thème
+   AgentAvatar — rendu personnage (image générée ou fallback SVG)
    ============================================================ */
 export function AgentAvatar({
   agent,
@@ -85,95 +84,28 @@ export function AgentAvatar({
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
       <div className="relative" style={{ width: "100%", aspectRatio: "3/4" }}>
-        <svg viewBox="0 0 120 160" className="w-full h-full" style={{ filter: `drop-shadow(0 0 12px ${color}88)` }}>
-          <defs>
-            <linearGradient id={`armor-${agent.id}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.9" />
-              <stop offset="50%" stopColor={color} stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#05060F" stopOpacity="1" />
-            </linearGradient>
-            <linearGradient id={`glow-${agent.id}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="1" />
-              <stop offset="100%" stopColor={color} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {/* Halo de fond */}
-          <ellipse cx="60" cy="80" rx="50" ry="70" fill={`url(#glow-${agent.id})`} opacity="0.15" />
-          {/* Casque */}
-          <path
-            d="M 45 30 Q 45 18 60 18 Q 75 18 75 30 L 78 50 Q 78 55 60 55 Q 42 55 42 50 Z"
-            fill={`url(#armor-${agent.id})`}
-            stroke={color}
-            strokeWidth="1.5"
-          />
-          {/* Visière */}
-          <path
-            d="M 48 36 Q 60 32 72 36 L 70 44 Q 60 42 50 44 Z"
-            fill={color}
-            opacity="0.8"
-          />
-          <line x1="60" y1="38" x2="60" y2="42" stroke="#05060F" strokeWidth="0.5" />
-          {/* Plastron */}
-          <path
-            d="M 38 55 L 82 55 L 85 95 L 78 100 L 42 100 L 35 95 Z"
-            fill={`url(#armor-${agent.id})`}
-            stroke={color}
-            strokeWidth="1.5"
-          />
-          {/* Lignes de plaque */}
-          <line x1="60" y1="55" x2="60" y2="100" stroke={color} strokeWidth="0.8" opacity="0.6" />
-          <line x1="42" y1="70" x2="78" y2="70" stroke={color} strokeWidth="0.5" opacity="0.4" />
-          {/* Épaules */}
-          <ellipse cx="35" cy="60" rx="8" ry="12" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          <ellipse cx="85" cy="60" rx="8" ry="12" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          {/* Bras */}
-          <rect x="28" y="65" width="10" height="30" rx="4" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          <rect x="82" y="65" width="10" height="30" rx="4" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          {/* Jambes */}
-          <rect x="44" y="100" width="14" height="45" rx="3" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          <rect x="62" y="100" width="14" height="45" rx="3" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-          {/* Genouillères */}
-          <ellipse cx="51" cy="120" rx="5" ry="3" fill={color} opacity="0.7" />
-          <ellipse cx="69" cy="120" rx="5" ry="3" fill={color} opacity="0.7" />
-          {/* Core lumineux (poitrine) */}
-          <circle cx="60" cy="72" r="4" fill={color}>
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="60" cy="72" r="2" fill="#FFFFFF" opacity="0.9" />
-          {/* Détails selon classe */}
-          {agent.class === "Tank" && (
-            <>
-              {/* Bouclier dorsal */}
-              <rect x="30" y="50" width="60" height="55" rx="2" fill="none" stroke={color} strokeWidth="0.5" opacity="0.3" strokeDasharray="2 2" />
-            </>
-          )}
-          {agent.class === "Assault" && (
-            <>
-              {/* Lames d'épaule */}
-              <path d="M 28 55 L 35 50 L 42 55" fill="none" stroke={color} strokeWidth="1.5" />
-              <path d="M 78 55 L 85 50 L 92 55" fill="none" stroke={color} strokeWidth="1.5" />
-            </>
-          )}
-          {agent.class === "Support" && (
-            <>
-              {/* Pack médical dorsal */}
-              <rect x="48" y="58" width="24" height="8" rx="2" fill={color} opacity="0.5" />
-              <circle cx="54" cy="62" r="1.5" fill="#FFFFFF" />
-              <circle cx="60" cy="62" r="1.5" fill="#FFFFFF" />
-              <circle cx="66" cy="62" r="1.5" fill="#FFFFFF" />
-            </>
-          )}
-          {agent.class === "Recon" && (
-            <>
-              {/* Capuche */}
-              <path d="M 42 30 Q 60 10 78 30 L 75 25 Q 60 12 45 25 Z" fill={`url(#armor-${agent.id})`} stroke={color} strokeWidth="1" />
-            </>
-          )}
-        </svg>
+        {/* Image réelle du personnage */}
+        <img
+          src={`/kinetics/agent-${agent.id}.png`}
+          alt={agent.displayName}
+          className="w-full h-full object-contain"
+          style={{ filter: `drop-shadow(0 0 16px ${color}aa)` }}
+          onError={(e) => {
+            // Masque l'image si elle ne charge pas
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+        {/* Halo lumineux derrière */}
+        <div
+          className="absolute inset-0 -z-10 flex items-center justify-center"
+          style={{
+            background: `radial-gradient(ellipse at center, ${color}33 0%, transparent 70%)`,
+          }}
+        />
         {/* Reflet au sol */}
         <div
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-2 rounded-full blur-sm"
-          style={{ background: `${color}44` }}
+          style={{ background: `${color}66` }}
         />
       </div>
       {showName && (

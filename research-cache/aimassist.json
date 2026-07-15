@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.gdcvault.com/play/1017942/Techniques-for-Building-Aim-Assist",
+    "name": "Techniques for Building Aim Assist in Console Shooters - GDC Vault",
+    "snippet": "The talk will cover basic camera movement topics like camera acceleration and deadzoning, as well as aim assist systems such as magnetism, centering, and ... Missing: auto fire soft lock best practices",
+    "host_name": "www.gdcvault.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/thefinals/comments/17kvp8s/aim_assist_mechanics",
+    "name": "aim assist mechanics : r/thefinals - Reddit",
+    "snippet": "auto rotation is also simple, rotates your camera in the direction of an enemy in a predefined bubble around said enemy. exists to keep your aim ... Missing: GDC | Show results with: GDC",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.gamedeveloper.com/design/how-to-create-a-fair-auto-aiming-system-in-a-robot-shooter-",
+    "name": "Featured Blog | How to create a 'fair' auto-aiming system in a robot shooter",
+    "snippet": "Target Lock: By pressing a designated button, players can lock the crosshair onto a specific target, making it easier to track. Once locked, the ... Missing: soft | Show results with: soft",
+    "host_name": "www.gamedeveloper.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=40OyU_9G94g",
+    "name": "BEST COD Mobile Settings for PERFECT Aim! (HUD  - YouTube",
+    "snippet": "As a phone user, previously with my 4 finger hud, I had gyroscope turned on (with very low sens), and everytime I shoot, I tilt the phone ... Missing: practices GDC",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=7hpAIfwOfWk",
+    "name": "Aim Assist Explained! PUBG Mobile Pro Tips and Tricks [2025] Use It",
+    "snippet": "... Aim Assist in PUBG Mobile? Should you keep Aim Assist ON or OFF? Best Aim Assist tips for close-range & mid-range fights Why Aim Assist ... Missing: soft lock practices GDC",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.tiktok.com/@iosrakib3/video/7659333131346005269",
+    "name": "Best Aim Lock Sensitivity for Mobile FPS - TikTok",
+    "snippet": "Players who use aim-assist or aim-lock tools should test sensitivity values rather than rely on defaults. Why sensitivity matters Aim-lock ...",
+    "host_name": "www.tiktok.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.designmonks.co/blog/perfect-mobile-button-size",
+    "name": "Perfect Mobile Button Size: Tips, Guidelines, and Best Practices",
+    "snippet": "Minimum button size should be 42 px (9×9 mm) for accessibility. Comfortable button size is around 50 px (10×10 mm), matching the fingertip area.",
+    "host_name": "www.designmonks.co",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/top-content/user-experience/mobile-first-design-principles/touch-target-sizing-guidelines",
+    "name": "Touch Target Sizing Guidelines - LinkedIn",
+    "snippet": "Increase target size: Make sure that each clickable or tappable area is at least 24x24 pixels on web, or 44x44 points for iOS and 48x48 dp for Android, so users ...",
+    "host_name": "www.linkedin.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.capiproduct.com/post/10-best-practices-for-designing-effective-touch-targets-in-mobile-ui",
+    "name": "5 Best Practices for Designing Effective Touch Targets in Mobile UI",
+    "snippet": "The recommended minimum size for touch targets is 44x44 pixels. This size accommodates users with varying finger sizes. Avoid making buttons ...",
+    "host_name": "www.capiproduct.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks",
+    "name": "Accessible Target Sizes Cheatsheet - Smashing Magazine",
+    "snippet": "When designing for touch today, we need to use at least 27×27px for small links or icons in the content area and at least 44×44px for icons at ...",
+    "host_name": "www.smashingmagazine.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nngroup.com/articles/touch-target-size",
+    "name": "Touch Targets on Touchscreens - NN/G",
+    "snippet": "Summary: Interactive elements must be at least 1cm × 1cm (0.4in × 0.4in) to support adequate selection time and prevent fat-finger errors.",
+    "host_name": "www.nngroup.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://mobilefreetoplay.com/control-mechanics",
+    "name": "Touch Control Design: Ways Of Playing On Mobile",
+    "snippet": "This chapter serves as reference for designing touch controls that work on mobile or small touch screen devices. Missing: FPS 2024",
+    "host_name": "mobilefreetoplay.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://uxmovement.com/mobile/optimal-size-and-spacing-for-mobile-buttons",
+    "name": "Optimal Size and Spacing for Mobile Buttons - UX Movement",
+    "snippet": "42 pixels is the minimum and 72 pixels is the maximum button size that's most optimal for users. The most preferred button size was 60 pixels.",
+    "host_name": "uxmovement.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://devforum.roblox.com/t/how-to-properly-make-mobile-buttons/2886240",
+    "name": "How to \"PROPERLY\" make mobile buttons - Developer Forum | Roblox",
+    "snippet": "There are 2 ways you can solve this issue, mine involves with binding Render step and update the GUI position to where your touch pos is.",
+    "host_name": "devforum.roblox.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.neofps.com/manual/input-touchscreen.html",
+    "name": "Touchscreen Input | NeoFPS Scripting Reference",
+    "snippet": "NeoFPS comes with a custom touchscreen setup for games targeting mobile devices. There are input manager and input system versions of the touch controls.",
+    "host_name": "docs.neofps.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://steamcommunity.com/sharedfiles/filedetails/?l=german&id=1888830141",
+    "name": "Steam Link Touch Controller Guide - A Visual Introduction",
+    "snippet": "This guide will get you started on how to use the Steam Link app's Touch Controller and how to create configs for it.",
+    "host_name": "steamcommunity.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

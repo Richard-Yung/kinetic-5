@@ -33,8 +33,10 @@ export function StartScreen() {
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url(/kinetics/start-bg.png)" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/40 via-k5-deep-space/60 to-k5-deep-space" />
+      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/30 via-k5-deep-space/60 to-k5-deep-space" />
       <StarfieldBackground density={60} />
+      {/* Vignette + scanlines */}
+      <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: "inset 0 0 200px rgba(5, 6, 15, 0.9)" }} />
 
       {/* En-tête : logo + tagline */}
       <header className="relative z-10 pt-12 px-6 text-center safe-top">

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=t0saO-MreUU",
+    "name": "Advanced FPS Enemy AI with Patrol, Chase & Attack States - YouTube",
+    "snippet": "Learn how to create an advanced Enemy Shooter AI system for your FPS game using the powerful State Machine behavior system in Unity. Missing: flank retreat\nLearn how to create an advanced Enemy Shooter AI system for your FPS game using the powerful State Machine behavior system in Unity. Missing: flank | Show results with: flank",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Mp8yFUKxldk",
+    "name": "Patrolling : Let's Make a First Person Game in Unity! - YouTube",
+    "snippet": "In this video we setup the foundations of a finite state machine and create a basic patrolling behaviour, Come Join us on the Discord! Missing: flank retreat",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_Z1t7MNk0c4",
+    "name": "SHOOTING/FOLLOW/RETREAT ENEMY AI WITH UNITY AND C#",
+    "snippet": "Welcome to BlackthornProd ! In this tutorial I will bring you through the process of bringing to life an enemy that moves towards a certain ... Missing: FPS flank",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Unity3D/comments/1p9i0mn/we_just_released_a_tactical_cover_retreat_ai",
+    "name": "We just released a Tactical Cover & Retreat AI System for Unity (50",
+    "snippet": "The system lets agents evaluate their surroundings in real time and choose the best cover or retreat position based on a wide range of tactical ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@IAMFANTASYSTORYTELLER/how-to-build-a-simple-ai-enemy-in-unity-beginner-tutorial-2025-7079fb0be555",
+    "name": "How to Build a Simple AI Enemy in Unity (Beginner Tutorial 2025)",
+    "snippet": "Ever wondered how enemies in games seem to “think”? They patrol, chase, attack, and even retreat — all powered by basic AI logic.",
+    "host_name": "medium.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=l8ADGZTwhmk",
+    "name": "Simple Enemy AI in Unity (Patrol, Chase, Attack) - YouTube",
+    "snippet": "Hello fantastic people! In this video I show how to create a simple but effective enemy AI for a 3D game in Unity. Even though this tutorial ... Missing: FPS flank retreat",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/blaz-cerpnjak/intelligent-opponent-shooter-game-unity",
+    "name": "Intelligent Opponents in Unity using Finite State Machine - GitHub",
+    "snippet": "The FSM approach allowed for the dynamic control of the opponents' behaviors, enabling them to adapt and respond intelligently to different in-game situations.",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com/t/released-enemy-ai/782063",
+    "name": "[RELEASED] Enemy AI - Unity Discussions",
+    "snippet": "This package features ready to use enemies that can patrol, search, and engage, looking for cover protection, a FPS, or a top down shooter,\nThis package features ready to use enemies that can patrol, search, and engage, The patrol state is a clear alert level state,",
+    "host_name": "discussions.unity.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pavcreations.com/finite-state-machine-for-ai-enemy-controller-in-2d",
+    "name": "Finite State Machine for AI Enemy Controller in 2D - Pav Creations",
+    "snippet": "In this article I'm going to focus on how you can use a Finite State Machine for implementing a simple, yet effective NPCs AI.",
+    "host_name": "pavcreations.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=eR-AGr5nKEU",
+    "name": "EASY Unity Enemy AI using a State Machine - YouTube",
+    "snippet": "... unity.com/packages/vfx/particles/cartoon-fx-remaster-free-109565?aid=1101lw3sv Casual Game SFX (FREE): https://assetstore.unity.com/packages ... Missing: FPS patrol flank retreat",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

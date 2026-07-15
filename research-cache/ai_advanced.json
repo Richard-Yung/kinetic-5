@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=85kogmzcLXw",
+    "name": "GOAP Enemy AI FULL IMPLEMENTATION | Unity Tutorial",
+    "snippet": "Go to this video's Sponsor: https://snhu.edu/llamacademy to see what the current average annual salary for a game developer programmer is ... Missing: utility shooter",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tonogameconsultants.com/game-ai-planning",
+    "name": "Game AI Planning: GOAP, Utility, and Behavior Trees",
+    "snippet": "Explore game AI planning systems, GOAP, utility, classical, and behavior trees, and learn how they shape smarter NPC decisions in games.",
+    "host_name": "tonogameconsultants.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/gamedev/comments/1dls8tk/is_using_behavior_trees_a_good_option_for_enemy",
+    "name": "Is using behavior trees a good option for enemy AI in my first FPS shooter",
+    "snippet": "I've done some research and it seems like behavior trees are a popular choice, but I'm not sure if they are the right fit for my project. Behavior Trees really necessary? : r/Unity3D - Reddit Has GOAP been used or recreated for “soldier” AI since FEAR? - Reddit More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=J7RnUc4g9Pk",
+    "name": "Enemy Behavior Tree AI FULL IMPLEMENTATION (AI Tree)",
+    "snippet": "Go to this video's Sponsor: https://snhu.edu/llamacademy to see what the current average annual salary for a game developer programmer is ... Missing: utility shooter",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.jmis.org/archive/view_article?pid=jmis-10-4-321",
+    "name": "GOBT: A Synergistic Approach to Game AI Using Goal-Oriented and",
+    "snippet": "In this paper, we propose a novel game AI framework, the Goal-Oriented Behavior Tree, using Unity game engine for simulations. Missing: shooter | Show results with: shooter",
+    "host_name": "www.jmis.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com/t/bt-vs-goap-for-game-ai/913102",
+    "name": "BT vs. GOAP for game AI - Unity Discussions",
+    "snippet": "You can integrate behaviour trees in segments, integrating them into the actions themselves. Maybe you need a different action for a different ...",
+    "host_name": "discussions.unity.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

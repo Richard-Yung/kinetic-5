@@ -527,3 +527,67 @@ Stage Summary:
 - 0 erreur lint, 0 erreur runtime, serveur stable
 - Palette #1AA1CE + typo Audiowide respectées fidèlement
 - Flow complet : Start → Loading → Lobby → Loadout → Mission FPS → Victory/Defeat → Operation Summary → Settings
+
+---
+Task ID: r2
+Agent: Game Research
+Task: Research similar FPS games for KINETICS 5 systems (Destiny 2, Snowbreak, CoD Mobile, Shadowgun DeadZone, N.O.V.A. Legacy, Dead Effect 2, Modern Combat 5, Apex Legends Mobile + best practices for touch controls, enemy AI state machines, HUD design, Unity mobile FPS controller assets)
+
+Work Log:
+- Lecture du worklog.md (530 lignes) + structure projet KINETICS 5 (108 fichiers C# Unity + prototype web Next.js) pour cadrer la recherche : 4 agents (VULCAN/XEN/JOLT/XANO), 9 armes (5 primary + 4 secondary), 4 tacticals, 7 missions, palette #1AA1CE/Audiowide, HUD déjà spécifié (minimap top-right collapsible, ammo "20|60 RIFLE", Health 5000 + Armor, time 12:39).
+- Exécution de 12 requêtes `z-ai web_search` en parallèle (4 batches de 4 + 4 batches de 4) :
+  • 8 recherches par jeu (Destiny 2 / Snowbreak / CoD Mobile / Shadowgun / N.O.V.A. Legacy / Dead Effect 2 / MC5 / Apex Mobile)
+  • 4 recherches best-practices ("mobile FPS touch controls best practices 2024" / "FPS game enemy AI state machine mobile" / "mobile shooter HUD design patterns" / "Unity FPS mobile controller asset")
+  • 4 recherches complémentaires (Destiny 2 enemy AI factions + mission types, Apex Mobile Fade/Rhapsody/Loba abilities, CoD Mobile 4-finger claw HUD placement, Snowbreak Operatives weapon types, mobile FPS aim assist GDC, Unity BT/GOAP, boss fight phases Destiny raid)
+  • Résultats JSON sauvés dans /home/z/my-project/research-cache/ (12 fichiers JSON, ~80 résultats web)
+- Synthèse des résultats web + connaissance domaine de chaque jeu pour produire un rapport markdown de 8576 mots / 570 lignes à `/home/z/my-project/research-games.md` couvrant :
+  • Section 1 : analyse par jeu (8 jeux) avec les 8 dimensions demandées (touch controls, movement, combat feel, enemy AI, mission structure, HUD elements, progression, navigation)
+  • Section 2 : best practices synthétisés (touch controls avec tailles cibles 44-72px, FSM + utility pour AI, HUD patterns coins/edges, Unity assets évalués)
+  • Section 3 : recommandations spécifiques KINETICS 5 :
+    - Layout touch controls exact (positions viewport + sizes px) pour 2-finger default et 4-finger claw preset
+    - Tableau 9 archetypes ennemis (Grunt/Rifleman/Heavy/Sniper/Shotgunner/SuicideBomber/Shieldbearer/Drone/Boss) avec FSM tuning par archetype
+    - Structure 4-beat des 7 missions KINETICS 5 (SHADOW FALL → FINAL VECTOR) avec boss 3-phase pour missions 4 et 7
+    - Tableau 15 nouveaux éléments HUD à ajouter (compass, damage direction, hit markers, boss HP bar, objective tracker, etc.)
+    - Spécifications movement/combat (slide, dodge, cover-snap, mantle, auto-fire, aim assist 3 modes, recoil patterns, hitstop, screen shake, combo chain, discharge ultimate)
+  • Section 4 : mapping recommandations → fichiers Unity existants (InputManager, PlayerController, EnemyAI, BossPhaseManager, MissionDirector, HUDController, WeaponSO, EnemySO, MissionSO, AgentSO, etc.)
+  • Section 5 : liste des sources web (30+ URLs)
+  • Section 6 : top 10 actions priorisées pour K5
+
+Stage Summary:
+- **Rapport de recherche livré** : `/home/z/my-project/research-games.md` (570 lignes, 8576 mots, dépasse largement le seuil 3000+ mots demandé).
+- **12 fichiers JSON de résultats web** conservés dans `/home/z/my-project/research-cache/` pour référence future des autres agents (destiny2, snowbreak, codm, shadowgun, novalegacy, deadeffect2, mc5, apexmobile, bestpractices, aistate, huddesign, unityassets, + 4 deep-dive searches : d2_enemies, d2_missions, apex_chars, codm_hud, snowbreak_chars, aimassist, ai_advanced, boss_phases).
+- **Recommandations clés pour KINETICS 5** :
+  1. **Touch controls** : layout 2-finger default (joystick 180px @0.18/0.20, fire 140px @0.78/0.22, ADS/reload/jump/grenade/switch weapon autour) + preset 4-finger claw avancé. Auto-fire ON par défaut. Gyro toggle off par défaut. Toutes positions/sizes documented.
+  2. **Enemy AI** : FSM existant (EnemyAI.cs) à étendre avec Squad/Flank/Retreat-to-heal states + EnemyAlertedEvent broadcast via GameEventBus (squad alert avec 0.5-2s délai radio simulé). 9 archetypes avec tuning spécifique. Boss 3-phase avec damage gates 33%/66% + cinematics (Hitstop + CameraShake).
+  3. **Mission structure** : 4-beat pattern (Infiltrate → Arena wave → Mid-boss → Boss/Extraction) appliqué aux 7 missions K5. Boss full pour Mission 4 (TITAN mech) et Mission 7 (ADMIRAL NYX cyborg 3-phase avec escort + environment mechanics). Mini-boss pour Missions 3, 6.
+  4. **HUD** : 15 nouveaux éléments à ajouter au HUDController existant (compass strip top-center, damage direction arcs, hit markers 4-prong colorés cyan/jaune/rouge, boss HP bar top-center avec phase ticks, objective tracker top-left, enemy engaged indicator, ability cooldown radials, ultimate charge bar, weapon swap wheel, grenade arc, loot prompt, checkpoint indicator, low-ammo warning, low-HP vignette, subtitles).
+  5. **Movement/Combat** : slide (crouch+sprint), dodge per-agent (XEN signature), cover-snap mission-flag (DEEP SIGNAL + BLACK ECHO), mantle auto. Auto-fire smart mode. Aim assist 3 modes (Off/Soft/Strong). Recoil per-weapon avec reload-cancel (Destiny pattern). Hitstop 0.04s sur heavy hits. Combo chain ×1.5 @10 kills. Discharge ultimate per-agent (VULCAN AOE shockwave, XEN time-slow, JOLT team heal, XANO recon pulse).
+  6. **Difficulty scaling** : multiplieurs Easy/Normal/Hard (HP 0.75/1.0/1.35, damage 0.70/1.0/1.30, reaction 1.5/1.0/0.65, accuracy 0.60/1.0/1.30, aggression 0.70/1.0/1.30) à appliquer via DifficultyManager.cs.
+- **Mapping fichiers Unity** : 21 fichiers KINETICS 5 existants identifiés comme cibles d'extension (InputManager, PlayerController, PlayerCombat, EnemyAI, EnemyController, EnemySpawner, BossController, BossPhaseManager, MissionDirector, ObjectiveTracker, ExtractionZone, HUDController, PlayerHUD, FloatingDamage, HitstopController, ScreenShake, ComboChain, DischargeSystem + 5 ScriptableObjects WeaponSO/EnemySO/MissionSO/AgentSO/ProgressionCurveSO).
+- **Pas de code écrit** (task research-only) — uniquement rapport markdown + worklog append. Aucun fichier Unity modifié.
+- **Note pour agents Unity (2-x)** : le rapport §4 (Implementation Notes) liste action par fichier — chaque agent Unity peut pick-up une ligne du tableau et l'implémenter sans conflit avec les autres. Recommandation : prioriser InputManager (preset 4-finger) + EnemyAI (squad alert) + HUDController (15 nouveaux éléments) + BossPhaseManager (3-phase) en premier.
+
+---
+Task ID: REBUILD
+Agent: Lead (Z.ai Code)
+Task: Reconstruction FPS suite retours utilisateur (contrôles manquants, ennemis invisibles, environnement noir)
+
+Work Log:
+- Réanalysé PDF pages 4, 6, 9, 10 en haute résolution (3x) via VLM pour extraire détails exacts du HUD et des personnages
+- Recherche 8 jeux similaires (Destiny 2, Snowbreak, CoD Mobile, Shadowgun, N.O.V.A., Dead Effect 2, MC5, Apex Mobile) → rapport 8576 mots
+- Généré 4 images personnages (VULCAN/XEN/JOLT/XANO) via image-generation basées sur descriptions PDF
+- Généré background vaisseau + image ennemi
+- Reconstruit fps-game.tsx : environnement multi-zones navigable (zone centrale + 4 corridors + 4 zones secondaires avec portes), éclairage fort (6 point lights + hemisphere + directional), ennemis visibles (glow emissive, halo au sol, barre de vie), IA poursuite + strafe + tir, tracers de tir visibles
+- Reconstruit touch-controls.tsx : contrôles TOUJOURS visibles (desktop + mobile), joystick MOVE + 6 boutons (FIRE/AIM/GRN/SWP/RLD/SPR/JMP) + switch arme 1/2/3 + aide contrôles desktop
+- Modifié AgentAvatar pour utiliser images générées (au lieu SVG)
+- Ajouté background vaisseau au lobby
+- Spawn ennemis : moitié devant joueur (visible), moitié zones secondaires
+- Lint clean, 0 erreur runtime
+- Validé agent-browser : Start → Lobby → Mission, Canvas 412x915, pixel RGBA(31,78,104) non-noir, ennemi visible, FIRE button fonctionnel (ennemi éliminé, compteur 4→3)
+
+Stage Summary:
+- Jeu maintenant JOUABLE : contrôles visibles + fonctionnels, ennemis visibles, environnement navigable multi-zones
+- 4 personnages générés en images réelles (VULCAN/XEN/JOLT/XANO)
+- Background vaisseau généré
+- Système de combat complet : tir hitscan + tracers, headshots, IA ennemie, vagues, mort/respawn, switch arme, reload, grenade
+- HUD fidèle au PDF page 6
