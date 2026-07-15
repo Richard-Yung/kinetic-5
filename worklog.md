@@ -591,3 +591,23 @@ Stage Summary:
 - Background vaisseau généré
 - Système de combat complet : tir hitscan + tracers, headshots, IA ennemie, vagues, mort/respawn, switch arme, reload, grenade
 - HUD fidèle au PDF page 6
+
+---
+Task ID: SCREENS-REBUILD
+Agent: Lead (Z.ai Code)
+Task: Recodage écrans Start + Loading au millimètre près d'après image PDF
+
+Work Log:
+- Rendu PDF page 2 en ultra-haute résolution (4x, 2382x3368px)
+- Découpage des 2 écrans (start: y=280-1244, loading: y=1244-2353)
+- Extraction des backgrounds source (2169x974 et 2169x1119)
+- Nettoyage agressif des backgrounds : masquage des zones UI (logo, boutons, texte loading, %, barre) avec noir opaque
+- Recodage start-screen.tsx : background=source nettoyée, logo KINETICS·5 top-left, 5 boutons HORIZONTAUX (NEW GAME cyan, autres gris foncé), grille, étoiles, coins décoratifs
+- Recodage loading-screen.tsx : background=source nettoyée (garde personnage armuré + bataille), TIP text box haut, LOADING + barre progression segmentée + % dynamique, mission preview, indicateurs étapes
+- Vérification VLM : Start 9/10 (no ghosting), Loading 8/10 (no ghosting)
+
+Stage Summary:
+- Écran Start : correspond au design PDF (planète + espace + 5 boutons horizontaux + logo)
+- Écran Loading : correspond au design PDF (personnage armuré + bataille + TIP + barre + %)
+- Assets extraits du PDF : planète, personnage, backgrounds space/battle
+- Plus de ghosting (backgrounds nettoyés)

@@ -1,17 +1,24 @@
 "use client";
 
 /**
- * KINETICS 5 — Écran de démarrage (PDF page 2)
- * Boutons : NEW GAME / CONTINUE / LOAD GAME / OPTIONS / QUIT
- * Fond : scène spatiale + personnage armuré
- * Logo KINETICS 5 en Audiowide
+ * KINETICS 5 — Écran de démarrage (PDF page 2 — écran du haut)
+ * Recodé au millimètre près d'après l'image de référence.
+ *
+ * Layout exact (d'après VLM analyse de l'image source) :
+ * - Background : scène spatiale avec planète centrée + vaisseaux + étoiles
+ * - Logo "KINETICS·5" : 10% gauche, 40% haut (blanc, Audiowide)
+ * - 5 boutons HORIZONTAUX à 55% haut :
+ *   NEW GAME (cyan #00BFFF), CONTINUE/LOAD GAME/OPTIONS/QUIT (gris foncé #333333)
+ * - Grille subtile en overlay
+ * - Astuce en bas
  */
 
-import { KButton, KLogo } from "@/components/kinetics/ui";
+import { KButton } from "@/components/kinetics/ui";
 import { StarfieldBackground } from "@/components/kinetics/visuals";
 import { useGameStore } from "@/store/game-store";
 import { t } from "@/lib/i18n";
 import { useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 export function StartScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -23,77 +30,84 @@ export function StartScreen() {
     { id: "continue", label: t(language, "start.continue"), action: () => setScreen("lobby") },
     { id: "load", label: t(language, "start.loadGame"), action: () => setScreen("lobby") },
     { id: "options", label: t(language, "start.options"), action: () => setScreen("settings") },
-    { id: "quit", label: t(language, "start.quit"), action: () => window.close(), danger: true },
+    { id: "quit", label: t(language, "start.quit"), action: () => window.close() },
   ];
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden flex flex-col">
-      {/* Fond image + étoiles */}
+    <div className="relative w-full h-screen min-h-[500px] overflow-hidden flex flex-col">
+      {/* === BACKGROUND : image source du PDF nettoyée (scène spatiale + planète) === */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url(/kinetics/start-bg.png)" }}
+        style={{
+          backgroundImage: "url(/kinetics/start-bg-clean.png)",
+          backgroundPosition: "center 40%",
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/30 via-k5-deep-space/60 to-k5-deep-space" />
-      <StarfieldBackground density={60} />
-      {/* Vignette + scanlines */}
-      <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: "inset 0 0 200px rgba(5, 6, 15, 0.9)" }} />
+      {/* Assombrir le bas pour les boutons */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-k5-deep-space/80" />
+      {/* Vignette */}
+      <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: "inset 0 0 150px rgba(5, 6, 15, 0.6)" }} />
+      {/* Grille subtile */}
+      <div className="absolute inset-0 k5-grid-bg opacity-20" />
+      {/* Étoiles animées */}
+      <StarfieldBackground density={30} />
 
-      {/* En-tête : logo + tagline */}
-      <header className="relative z-10 pt-12 px-6 text-center safe-top">
-        <div className="inline-block">
-          <div className="text-xs font-display tracking-[0.4em] text-k5-cyan k5-text-glow-cyan mb-2">
-            {t(language, "start.tagline")}
-          </div>
-          <KLogo size="lg" className="k5-pulse" />
-          <div className="mt-2 h-px w-48 mx-auto bg-gradient-to-r from-transparent via-k5-cyan to-transparent" />
-          <div className="mt-1 text-[10px] font-display tracking-[0.3em] text-k5-muted">
-            EXPLORATION • COMBAT • DOMINATION
-          </div>
+      {/* === LOGO KINETICS·5 === */}
+      <div className="relative z-10 pt-[8%] px-[5%]">
+        <div className="font-display text-3xl sm:text-4xl md:text-5xl text-white tracking-wider k5-text-glow-cyan">
+          KINETICS<span className="text-k5-cyan mx-1">·</span>5
         </div>
-      </header>
-
-      {/* Centre : personnage / décor */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-2xl">
-          {/* Boutons menu — empilés verticalement style PDF */}
-          <nav className="flex flex-col gap-3 items-center">
-            {menu.map((item) => (
-              <KButton
-                key={item.id}
-                variant={item.primary ? "primary" : item.danger ? "danger" : "secondary"}
-                size="lg"
-                glow={item.primary}
-                className="w-full max-w-xs"
-                onMouseEnter={() => setHoveredBtn(item.id)}
-                onMouseLeave={() => setHoveredBtn(null)}
-                onClick={item.action}
-              >
-                <span className="flex items-center justify-center gap-3">
-                  {hoveredBtn === item.id && (
-                    <span className="text-k5-cyan">▸</span>
-                  )}
-                  {item.label}
-                </span>
-              </KButton>
-            ))}
-          </nav>
+        <div className="text-[10px] font-display tracking-[0.3em] text-k5-cyan/70 mt-1">
+          {t(language, "start.tagline")}
         </div>
-      </main>
+      </div>
 
-      {/* Pied de page : version + credit */}
-      <footer className="relative z-10 px-6 py-4 flex justify-between items-center text-[10px] font-display tracking-wider text-k5-muted safe-bottom">
-        <span>v0.1.0 — BUILD 2025.01</span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-k5-green animate-pulse" />
-          SERVERS ONLINE
-        </span>
-      </footer>
+      {/* === BOUTONS MENU HORIZONTAUX (d'après le PDF) === */}
+      <div className="relative z-10 flex-1 flex items-center justify-center px-[3%]">
+        <nav className="flex flex-row gap-2 sm:gap-3 w-full max-w-4xl justify-center flex-wrap">
+          {menu.map((item) => (
+            <button
+              key={item.id}
+              onMouseEnter={() => setHoveredBtn(item.id)}
+              onMouseLeave={() => setHoveredBtn(null)}
+              onClick={item.action}
+              className={`
+                relative px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-display tracking-wider uppercase
+                border transition-all duration-150 select-none no-select k5-clip-sm
+                ${item.primary
+                  ? "bg-k5-cyan text-k5-deep-space border-k5-cyan k5-glow-cyan hover:brightness-110"
+                  : "bg-k5-deep-space/80 text-white border-k5-border/60 hover:border-k5-cyan hover:bg-k5-panel/80"
+                }
+                ${hoveredBtn === item.id ? "scale-105 -translate-y-0.5" : ""}
+              `}
+              style={item.primary ? { boxShadow: "0 0 20px rgba(26, 161, 206, 0.5)" } : undefined}
+            >
+              <span className="flex items-center gap-1.5">
+                {hoveredBtn === item.id && <ChevronRight className="w-3 h-3" />}
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
-      {/* Bordures décoratives sci-fi */}
-      <div className="pointer-events-none absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-k5-cyan/40" />
-      <div className="pointer-events-none absolute top-0 right-0 w-32 h-32 border-r-2 border-t-2 border-k5-cyan/40" />
-      <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-k5-cyan/40" />
-      <div className="pointer-events-none absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-k5-cyan/40" />
+      {/* === BAS : tagline + statut serveur === */}
+      <div className="relative z-10 px-[5%] pb-4 safe-bottom flex justify-between items-end text-[10px] font-display tracking-wider text-k5-muted">
+        <div>
+          <div className="text-k5-cyan/60">EXPLORATION • COMBAT • DOMINATION</div>
+          <div className="mt-0.5">v0.1.0 — BUILD 2025.01</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-k5-green animate-pulse k5-glow-green" />
+          <span>SERVERS ONLINE</span>
+        </div>
+      </div>
+
+      {/* Coins décoratifs sci-fi */}
+      <div className="pointer-events-none absolute top-0 left-0 w-20 h-20 border-l-2 border-t-2 border-k5-cyan/30" />
+      <div className="pointer-events-none absolute top-0 right-0 w-20 h-20 border-r-2 border-t-2 border-k5-cyan/30" />
+      <div className="pointer-events-none absolute bottom-0 left-0 w-20 h-20 border-l-2 border-b-2 border-k5-cyan/30" />
+      <div className="pointer-events-none absolute bottom-0 right-0 w-20 h-20 border-r-2 border-b-2 border-k5-cyan/30" />
     </div>
   );
 }
