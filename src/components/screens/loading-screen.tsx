@@ -2,11 +2,11 @@
 
 /**
  * KINETICS 5 — Écran de chargement (PDF page 2 — écran du bas)
- * Positionnement EXACT d'après l'image de référence :
- * - Character : déjà dans le background (droite)
- * - TIP box : 15% haut, 12% gauche
- * - LOADING text + barre + % : BAS de l'écran (85% haut), 12% gauche
- * - Barre : 76% largeur
+ * Structure EXACTE d'après la référence :
+ * - Conteneur arrondi centré sur fond noir
+ * - Background (personnage armuré + bataille) À L'INTÉRIEUR du conteneur
+ * - TIP box en haut du conteneur
+ * - LOADING + barre + % centrés horizontalement dans le conteneur
  */
 
 import { useEffect } from "react";
@@ -33,37 +33,57 @@ export function LoadingScreen() {
   }, [loadingProgress, setScreen, setLoadingProgress]);
 
   return (
-    <div className="relative w-full h-screen min-h-[400px] overflow-hidden">
-      {/* === BACKGROUND : image source du PDF nettoyée (garde personnage + bataille à droite) === */}
+    <div className="relative w-full h-screen min-h-[400px] bg-black overflow-hidden flex items-center justify-center">
+      {/* === CONTENEUR ARRONDI === */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="relative overflow-hidden"
         style={{
-          backgroundImage: "url(/kinetics/loading-bg-clean.png)",
-          backgroundPosition: "center center",
+          width: "88%",
+          height: "75%",
+          borderRadius: "16px",
+          border: "2px solid rgba(26, 161, 206, 0.4)",
+          boxShadow: "0 0 40px rgba(26, 161, 206, 0.15), 0 8px 32px rgba(0,0,0,0.8)",
         }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/20 via-transparent to-k5-deep-space/40" />
-      <div className="absolute inset-0 k5-grid-bg opacity-10" />
-
-      {/* === TIP TEXT BOX : 15% haut, 12% gauche === */}
-      <div
-        className="absolute max-w-xs bg-k5-deep-space/85 backdrop-blur-sm border-l-2 border-k5-yellow px-3 py-2 k5-clip-sm"
-        style={{ top: "12%", left: "5%", zIndex: 10, maxWidth: "40%" }}
       >
-        <div className="text-[9px] font-display tracking-wider text-k5-yellow mb-0.5">
-          {t(language, "loading.tip")}
+        {/* Background (personnage + bataille) À L'INTÉRIEUR du conteneur */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url(/kinetics/loading-bg-clean.png)",
+            backgroundPosition: "center center",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+        <div className="absolute inset-0 k5-grid-bg opacity-10" />
+
+        {/* === TIP TEXT BOX : haut du conteneur === */}
+        <div
+          className="absolute bg-black/80 backdrop-blur-sm border-l-2 border-k5-yellow px-3 py-2"
+          style={{ top: "6%", left: "4%", maxWidth: "45%", zIndex: 10, borderRadius: "4px" }}
+        >
+          <div className="text-[9px] font-display tracking-wider text-k5-yellow mb-0.5">
+            {t(language, "loading.tip")}
+          </div>
+          <p className="text-[10px] text-white/90 leading-relaxed line-clamp-2">{loadingTip}</p>
         </div>
-        <p className="text-[10px] text-white/90 leading-relaxed line-clamp-3">{loadingTip}</p>
-      </div>
 
-      {/* === ÉLÉMENTS LOADING : BAS de l'écran (85% haut), 12% gauche === */}
-      <div
-        className="absolute"
-        style={{ bottom: "8%", left: "5%", right: "5%", zIndex: 10 }}
-      >
-        <div style={{ width: "76%", maxWidth: "600px" }}>
+        {/* === Info mission : haut-droite du conteneur === */}
+        <div
+          className="absolute text-right"
+          style={{ top: "6%", right: "4%", zIndex: 10 }}
+        >
+          <div className="font-display text-sm text-white k5-text-glow-cyan">{mission.displayName}</div>
+          <div className="text-[9px] text-k5-cyan">{mission.type.toUpperCase()} • {mission.region.toUpperCase()}</div>
+          <div className="text-[8px] text-k5-muted">REC. POWER {mission.recommendedPower}</div>
+        </div>
+
+        {/* === LOADING + barre + % : centrés horizontalement, 35% du haut === */}
+        <div
+          className="absolute"
+          style={{ top: "40%", left: "50%", transform: "translateX(-50%)", width: "80%", zIndex: 10 }}
+        >
           {/* LOADING text + % */}
-          <div className="flex items-baseline justify-between mb-1.5">
+          <div className="flex items-baseline justify-between mb-2">
             <span className="font-display text-sm text-k5-cyan k5-text-glow-cyan tracking-wider">
               {t(language, "loading.loading")}
             </span>
@@ -73,7 +93,7 @@ export function LoadingScreen() {
           </div>
 
           {/* Barre de progression */}
-          <div className="relative h-3 bg-k5-panel/90 border border-k5-border rounded-sm overflow-hidden">
+          <div className="relative h-3 bg-black/80 border border-k5-border rounded-sm overflow-hidden">
             <div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-k5-cyan-dark to-k5-cyan transition-all duration-150"
               style={{ width: `${loadingProgress}%`, boxShadow: "0 0 12px #1AA1CE" }}
@@ -81,7 +101,7 @@ export function LoadingScreen() {
             {/* Segments */}
             <div className="absolute inset-0 flex pointer-events-none">
               {Array.from({ length: 20 }).map((_, i) => (
-                <div key={i} className="flex-1 border-r border-k5-deep-space/60 last:border-r-0" />
+                <div key={i} className="flex-1 border-r border-black/60 last:border-r-0" />
               ))}
             </div>
             {/* Scan effect */}
@@ -92,7 +112,7 @@ export function LoadingScreen() {
           </div>
 
           {/* Indicateurs étapes */}
-          <div className="mt-2 flex gap-3 text-[8px] font-display">
+          <div className="mt-2 flex justify-center gap-4 text-[8px] font-display">
             {["TERRAIN", "ENTITIES", "AUDIO", "NETWORK"].map((step, i) => {
               const threshold = (i + 1) * 25;
               const done = loadingProgress >= threshold;
@@ -108,25 +128,22 @@ export function LoadingScreen() {
             })}
           </div>
         </div>
-      </div>
 
-      {/* === Info mission en bas à droite === */}
-      <div
-        className="absolute text-[9px] font-display text-k5-muted text-right"
-        style={{ bottom: "8%", right: "5%", zIndex: 10 }}
-      >
-        <div className="text-k5-cyan">{mission.displayName}</div>
-        <div>{mission.type.toUpperCase()} • {mission.region.toUpperCase()}</div>
-        <div>REC. POWER {mission.recommendedPower}</div>
-        <div>{t(language, "hud.timeLeft")}: {formatTime(mission.timeLimit)}</div>
-        <div>VAGUES: {mission.waves.length}</div>
-      </div>
+        {/* === Bas : time + vagues === */}
+        <div
+          className="absolute flex justify-between text-[9px] font-display text-k5-muted"
+          style={{ bottom: "4%", left: "4%", right: "4%", zIndex: 10 }}
+        >
+          <span>{t(language, "hud.timeLeft")}: {formatTime(mission.timeLimit)}</span>
+          <span>VAGUES: {mission.waves.length}</span>
+        </div>
 
-      {/* Coins décoratifs */}
-      <div className="pointer-events-none absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-k5-cyan/30 z-10" />
-      <div className="pointer-events-none absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-k5-cyan/30 z-10" />
-      <div className="pointer-events-none absolute bottom-0 left-0 w-12 h-12 border-l-2 border-b-2 border-k5-cyan/30 z-10" />
-      <div className="pointer-events-none absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-k5-cyan/30 z-10" />
+        {/* Coins décoratifs */}
+        <div className="pointer-events-none absolute top-0 left-0 w-10 h-10 border-l-2 border-t-2 border-k5-cyan/40" />
+        <div className="pointer-events-none absolute top-0 right-0 w-10 h-10 border-r-2 border-t-2 border-k5-cyan/40" />
+        <div className="pointer-events-none absolute bottom-0 left-0 w-10 h-10 border-l-2 border-b-2 border-k5-cyan/40" />
+        <div className="pointer-events-none absolute bottom-0 right-0 w-10 h-10 border-r-2 border-b-2 border-k5-cyan/40" />
+      </div>
     </div>
   );
 }

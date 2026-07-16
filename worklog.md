@@ -629,3 +629,19 @@ Stage Summary:
 - Start screen : 5 boutons en une ligne horizontale, fonds solides visibles, NEW GAME cyan autres sombres bordés
 - Loading screen : LOADING+barre+% en bas, TIP en haut-gauche, personnage à droite du background
 - Plus de wrapping, plus de fonds invisibles, plus d'éléments éparpillés
+
+---
+Task ID: POSITIONING-FIX-V2
+Agent: Lead (Z.ai Code)
+Task: Correction positionnement — conteneur arrondi + boutons avec fond
+
+Work Log:
+- Analysé capture utilisateur vs référence PDF : identifié absence de conteneur arrondi, boutons sans fond visible, éléments éparpillés
+- Obtenu layout exact référence : conteneur 85%×60% centré sur fond noir, background spatial À L'INTÉRIEUR, logo 15%/25% du conteneur, boutons 55% centrés
+- Recodé start-screen.tsx : conteneur arrondi (borderRadius 16px, border cyan, shadow), background DANS le conteneur, logo top-left, 5 boutons UNE LIGNE avec fonds solides (cyan + dark/85), supprimé éléments extra (version, server status)
+- Recodé loading-screen.tsx : même conteneur arrondi, background personnage DANS le conteneur, TIP top, LOADING+barre+% centrés à 40%, info mission haut-droite, time/vagues bas
+- Vérification VLM : Start 9/10, Loading 8/10
+
+Stage Summary:
+- Start screen : conteneur arrondi centré sur noir, background planète à l'intérieur, 5 boutons une ligne avec fonds solides, pas d'éléments parasites
+- Loading screen : conteneur arrondi, personnage à l'intérieur, éléments centrés et organisés
