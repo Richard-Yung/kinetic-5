@@ -2,23 +2,16 @@
 
 /**
  * KINETICS 5 — Écran de démarrage (PDF page 2 — écran du haut)
- * Recodé au millimètre près d'après l'image de référence.
- *
- * Layout exact (d'après VLM analyse de l'image source) :
- * - Background : scène spatiale avec planète centrée + vaisseaux + étoiles
- * - Logo "KINETICS·5" : 10% gauche, 40% haut (blanc, Audiowide)
- * - 5 boutons HORIZONTAUX à 55% haut :
- *   NEW GAME (cyan #00BFFF), CONTINUE/LOAD GAME/OPTIONS/QUIT (gris foncé #333333)
- * - Grille subtile en overlay
- * - Astuce en bas
+ * Positionnement EXACT d'après l'image de référence :
+ * - Logo KINETICS·5 : 10% gauche, 12% haut
+ * - 5 boutons en UNE SEULE LIGNE horizontale à 35% haut, centrés
+ * - NEW GAME : fond cyan solide ; autres : fond sombre visible avec bordure
+ * - Boutons NE DOIVENT PAS se replier sur plusieurs lignes
  */
 
-import { KButton } from "@/components/kinetics/ui";
-import { StarfieldBackground } from "@/components/kinetics/visuals";
 import { useGameStore } from "@/store/game-store";
 import { t } from "@/lib/i18n";
 import { useState } from "react";
-import { ChevronRight } from "lucide-react";
 
 export function StartScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -34,8 +27,8 @@ export function StartScreen() {
   ];
 
   return (
-    <div className="relative w-full h-screen min-h-[500px] overflow-hidden flex flex-col">
-      {/* === BACKGROUND : image source du PDF nettoyée (scène spatiale + planète) === */}
+    <div className="relative w-full h-screen min-h-[400px] overflow-hidden">
+      {/* === BACKGROUND : image source du PDF nettoyée === */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -43,56 +36,53 @@ export function StartScreen() {
           backgroundPosition: "center 40%",
         }}
       />
-      {/* Assombrir le bas pour les boutons */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-k5-deep-space/80" />
-      {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: "inset 0 0 150px rgba(5, 6, 15, 0.6)" }} />
-      {/* Grille subtile */}
-      <div className="absolute inset-0 k5-grid-bg opacity-20" />
-      {/* Étoiles animées */}
-      <StarfieldBackground density={30} />
+      {/* Vignette + assombrir */}
+      <div className="absolute inset-0 bg-gradient-to-b from-k5-deep-space/20 via-transparent to-k5-deep-space/60" />
+      <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: "inset 0 0 150px rgba(5, 6, 15, 0.5)" }} />
+      <div className="absolute inset-0 k5-grid-bg opacity-15" />
 
-      {/* === LOGO KINETICS·5 === */}
-      <div className="relative z-10 pt-[8%] px-[5%]">
-        <div className="font-display text-3xl sm:text-4xl md:text-5xl text-white tracking-wider k5-text-glow-cyan">
-          KINETICS<span className="text-k5-cyan mx-1">·</span>5
+      {/* === LOGO : 10% gauche, 12% haut === */}
+      <div className="absolute" style={{ top: "10%", left: "5%", zIndex: 10 }}>
+        <div className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-wider k5-text-glow-cyan leading-none">
+          KINETICS<span className="text-k5-cyan mx-0.5">·</span>5
         </div>
-        <div className="text-[10px] font-display tracking-[0.3em] text-k5-cyan/70 mt-1">
+        <div className="text-[9px] sm:text-[10px] font-display tracking-[0.3em] text-k5-cyan/70 mt-1">
           {t(language, "start.tagline")}
         </div>
       </div>
 
-      {/* === BOUTONS MENU HORIZONTAUX (d'après le PDF) === */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-[3%]">
-        <nav className="flex flex-row gap-2 sm:gap-3 w-full max-w-4xl justify-center flex-wrap">
-          {menu.map((item) => (
-            <button
-              key={item.id}
-              onMouseEnter={() => setHoveredBtn(item.id)}
-              onMouseLeave={() => setHoveredBtn(null)}
-              onClick={item.action}
-              className={`
-                relative px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-display tracking-wider uppercase
-                border transition-all duration-150 select-none no-select k5-clip-sm
-                ${item.primary
-                  ? "bg-k5-cyan text-k5-deep-space border-k5-cyan k5-glow-cyan hover:brightness-110"
-                  : "bg-k5-deep-space/80 text-white border-k5-border/60 hover:border-k5-cyan hover:bg-k5-panel/80"
-                }
-                ${hoveredBtn === item.id ? "scale-105 -translate-y-0.5" : ""}
-              `}
-              style={item.primary ? { boxShadow: "0 0 20px rgba(26, 161, 206, 0.5)" } : undefined}
-            >
-              <span className="flex items-center gap-1.5">
-                {hoveredBtn === item.id && <ChevronRight className="w-3 h-3" />}
-                {item.label}
-              </span>
-            </button>
-          ))}
-        </nav>
-      </div>
+      {/* === BOUTONS : UNE SEULE LIGNE horizontale à 35% haut, centrés === */}
+      <nav
+        className="absolute flex flex-row flex-nowrap justify-center items-center gap-2"
+        style={{ top: "33%", left: "50%", transform: "translateX(-50%)", zIndex: 10, width: "92%" }}
+      >
+        {menu.map((item) => (
+          <button
+            key={item.id}
+            onMouseEnter={() => setHoveredBtn(item.id)}
+            onMouseLeave={() => setHoveredBtn(null)}
+            onClick={item.action}
+            className={`
+              flex-1 min-w-0 max-w-[180px] px-3 py-3 text-[10px] sm:text-xs font-display tracking-wider uppercase
+              border-2 transition-all duration-150 select-none no-select k5-clip-sm whitespace-nowrap
+              ${item.primary
+                ? "bg-k5-cyan text-k5-deep-space border-k5-cyan"
+                : "bg-k5-panel/90 text-white border-k5-cyan/40"
+              }
+              ${hoveredBtn === item.id ? "scale-105 -translate-y-0.5 " + (item.primary ? "brightness-110" : "border-k5-cyan bg-k5-panel-light/90") : ""}
+            `}
+            style={item.primary
+              ? { boxShadow: "0 0 16px rgba(26, 161, 206, 0.6)" }
+              : { boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }
+            }
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
 
       {/* === BAS : tagline + statut serveur === */}
-      <div className="relative z-10 px-[5%] pb-4 safe-bottom flex justify-between items-end text-[10px] font-display tracking-wider text-k5-muted">
+      <div className="absolute bottom-0 left-0 right-0 px-[5%] pb-3 safe-bottom flex justify-between items-end text-[9px] font-display tracking-wider text-k5-muted z-10">
         <div>
           <div className="text-k5-cyan/60">EXPLORATION • COMBAT • DOMINATION</div>
           <div className="mt-0.5">v0.1.0 — BUILD 2025.01</div>
@@ -104,10 +94,10 @@ export function StartScreen() {
       </div>
 
       {/* Coins décoratifs sci-fi */}
-      <div className="pointer-events-none absolute top-0 left-0 w-20 h-20 border-l-2 border-t-2 border-k5-cyan/30" />
-      <div className="pointer-events-none absolute top-0 right-0 w-20 h-20 border-r-2 border-t-2 border-k5-cyan/30" />
-      <div className="pointer-events-none absolute bottom-0 left-0 w-20 h-20 border-l-2 border-b-2 border-k5-cyan/30" />
-      <div className="pointer-events-none absolute bottom-0 right-0 w-20 h-20 border-r-2 border-b-2 border-k5-cyan/30" />
+      <div className="pointer-events-none absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-k5-cyan/30 z-10" />
+      <div className="pointer-events-none absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-k5-cyan/30 z-10" />
+      <div className="pointer-events-none absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-k5-cyan/30 z-10" />
+      <div className="pointer-events-none absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-k5-cyan/30 z-10" />
     </div>
   );
 }

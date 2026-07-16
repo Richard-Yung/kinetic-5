@@ -611,3 +611,21 @@ Stage Summary:
 - Écran Loading : correspond au design PDF (personnage armuré + bataille + TIP + barre + %)
 - Assets extraits du PDF : planète, personnage, backgrounds space/battle
 - Plus de ghosting (backgrounds nettoyés)
+
+---
+Task ID: POSITIONING-FIX
+Agent: Lead (Z.ai Code)
+Task: Correction positionnement exact des écrans Start + Loading
+
+Work Log:
+- Analysé les captures d'écran utilisateur vs image de référence PDF
+- Identifié les problèmes : boutons se repliaient sur 2 lignes, fonds trop transparents, éléments loading au centre au lieu du bas
+- Obtenu positions exactes via VLM : logo 10%/12%, boutons 35% haut en une ligne, loading en bas 85%
+- Recodé start-screen.tsx : boutons en UNE SEULE LIGNE (flex-nowrap, flex-1, max-w), fonds solides (bg-k5-panel/90 + border-2), position absolute à 33% haut
+- Recodé loading-screen.tsx : éléments LOADING en BAS (bottom 8%), TIP en haut-gauche (12% haut), info mission en bas-droite
+- Vérification VLM : Start 9/10 (5 boutons une ligne, fonds visibles, logo top-left, planète visible), Loading 9/10 (loading en bas, TIP haut-gauche, personnage droite, positionnement propre)
+
+Stage Summary:
+- Start screen : 5 boutons en une ligne horizontale, fonds solides visibles, NEW GAME cyan autres sombres bordés
+- Loading screen : LOADING+barre+% en bas, TIP en haut-gauche, personnage à droite du background
+- Plus de wrapping, plus de fonds invisibles, plus d'éléments éparpillés
