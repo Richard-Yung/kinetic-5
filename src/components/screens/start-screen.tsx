@@ -2,7 +2,13 @@
 
 /**
  * KINETICS 5 — Écran de démarrage
- * Full-screen responsive, background everspace, logo top-left, 5 boutons en ligne.
+ * Détails cyberpunk/retro appliqués :
+ * - Texte grisâtre (pas blanc pur) : #C8CDD0
+ * - Logo deux tons : "KINETICS" bleu-cyan, "5" gris
+ * - Boutons à bordures coupées (clip-path cyberpunk)
+ * - Overlay sombre transparent sur le background
+ * - Lignes fines gris-blanc décoratives
+ * - NEW GAME : fond bleu, autres : texte simple sans fond
  */
 
 import { useGameStore } from "@/store/game-store";
@@ -22,6 +28,9 @@ export function StartScreen() {
     { id: "quit", label: t(language, "start.quit"), action: () => window.close() },
   ];
 
+  // Couleur texte grisâtre (pas blanc pur)
+  const textColor = "#C8CDD0";
+
   return (
     <div className="relative w-full h-screen min-h-[300px] overflow-hidden">
       {/* Background full-screen */}
@@ -32,45 +41,48 @@ export function StartScreen() {
         aria-hidden
       />
 
-      {/* Teinte bleue froide subtile */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "rgba(20, 40, 80, 0.15)", mixBlendMode: "color" }}
-      />
+      {/* Overlay sombre transparent (sous-couche) pour faire ressortir les textes */}
+      <div className="absolute inset-0" style={{ background: "rgba(5, 8, 16, 0.65)" }} />
 
-      {/* Degrade radial depuis la source lumineuse */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 60% 45%, rgba(180, 220, 255, 0.08) 0%, transparent 40%, rgba(5, 6, 15, 0.5) 100%)",
-        }}
-      />
+      {/* Teinte bleue froide */}
+      <div className="absolute inset-0" style={{ background: "rgba(20, 40, 80, 0.18)", mixBlendMode: "color" }} />
 
-      {/* Degrade vertical subtil */}
+      {/* Degrade radial */}
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(to bottom, rgba(10, 20, 50, 0.1) 0%, transparent 40%, rgba(0, 0, 5, 0.4) 100%)",
+          background: "radial-gradient(ellipse at 60% 45%, rgba(26, 161, 206, 0.1) 0%, transparent 50%, rgba(0, 0, 5, 0.4) 100%)",
         }}
       />
 
-      {/* Logo top-left */}
-      <div className="absolute" style={{ top: "5%", left: "4%", zIndex: 10 }}>
+      {/* Lignes fines gris-blanc décoratives (horizontales) */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
+        <div className="absolute left-0 right-0" style={{ top: "18%", height: "1px", background: "linear-gradient(to right, transparent, rgba(200, 205, 208, 0.25) 20%, rgba(200, 205, 208, 0.25) 80%, transparent)" }} />
+        <div className="absolute left-0 right-0" style={{ top: "82%", height: "1px", background: "linear-gradient(to right, transparent, rgba(200, 205, 208, 0.2) 20%, rgba(200, 205, 208, 0.2) 80%, transparent)" }} />
+      </div>
+
+      {/* Lignes verticales fines décoratives (bords) */}
+      <div className="absolute pointer-events-none" style={{ left: "3%", top: "10%", bottom: "10%", width: "1px", background: "linear-gradient(to bottom, transparent, rgba(200, 205, 208, 0.15) 30%, rgba(200, 205, 208, 0.15) 70%, transparent)", zIndex: 2 }} />
+      <div className="absolute pointer-events-none" style={{ right: "3%", top: "10%", bottom: "10%", width: "1px", background: "linear-gradient(to bottom, transparent, rgba(200, 205, 208, 0.15) 30%, rgba(200, 205, 208, 0.15) 70%, transparent)", zIndex: 2 }} />
+
+      {/* Logo top-left — deux tons : KINETICS bleu-cyan, 5 gris */}
+      <div className="absolute" style={{ top: "6%", left: "5%", zIndex: 10 }}>
         <h1
-          className="font-display text-white leading-none tracking-wider"
+          className="font-display leading-none tracking-wider flex items-baseline"
           style={{
             fontSize: "clamp(1.5rem, 5vw, 3.5rem)",
-            textShadow: "0 0 20px rgba(26, 161, 206, 0.8), 0 2px 8px rgba(0,0,0,0.9)",
+            textShadow: "0 0 18px rgba(26, 161, 206, 0.6), 0 2px 6px rgba(0,0,0,0.9)",
           }}
         >
-          KINETICS<span className="text-k5-cyan">·</span>5
+          <span style={{ color: "#1AA1CE" }}>KINETICS</span>
+          <span style={{ color: textColor, margin: "0 2px" }}>·</span>
+          <span style={{ color: textColor }}>5</span>
         </h1>
       </div>
 
-      {/* 5 boutons en une ligne horizontale, centres */}
+      {/* 5 boutons en ligne — bordures coupées cyberpunk (clip-path) */}
       <nav
-        className="absolute left-1/2 -translate-x-1/2 flex flex-row flex-nowrap items-center gap-3 sm:gap-5"
+        className="absolute left-1/2 -translate-x-1/2 flex flex-row flex-nowrap items-center gap-3 sm:gap-4"
         style={{ top: "55%", zIndex: 10 }}
       >
         {menu.map((item) => (
@@ -80,12 +92,20 @@ export function StartScreen() {
             onMouseLeave={() => setHovered(null)}
             onClick={item.action}
             className={`font-display uppercase tracking-wider whitespace-nowrap transition-all duration-150 select-none ${
-              item.primary ? "bg-k5-cyan text-white px-4 py-2" : "bg-transparent text-white px-2 py-2"
-            } ${hovered === item.id ? (item.primary ? "brightness-110 scale-105" : "text-k5-cyan") : ""}`}
+              item.primary ? "px-5 py-2.5" : "px-3 py-2.5"
+            } ${hovered === item.id ? (item.primary ? "brightness-110 scale-105" : "scale-105") : ""}`}
             style={{
               fontSize: "clamp(0.7rem, 1.8vw, 1.1rem)",
-              borderRadius: item.primary ? "3px" : "0",
-              boxShadow: item.primary ? "0 0 16px rgba(26, 161, 206, 0.5)" : "none",
+              // Bordure coupée cyberpunk : coin haut-droit + bas-gauche coupés
+              clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+              background: item.primary ? "#1AA1CE" : "rgba(10, 20, 35, 0.6)",
+              color: item.primary ? "#FFFFFF" : textColor,
+              border: item.primary ? "1px solid #1AA1CE" : "1px solid rgba(26, 161, 206, 0.35)",
+              boxShadow: item.primary
+                ? "0 0 16px rgba(26, 161, 206, 0.5), inset 0 0 8px rgba(255,255,255,0.1)"
+                : hovered === item.id
+                ? "0 0 10px rgba(26, 161, 206, 0.3)"
+                : "none",
             }}
           >
             {item.label}
