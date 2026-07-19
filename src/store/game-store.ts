@@ -112,7 +112,7 @@ const initialState = {
   equippedTacticalId: "frag_x",
   currentMissionId: null as string | null,
   combatResult: null as CombatResult | null,
-  language: "fr" as Language,
+  language: "en" as Language,
   difficulty: "normal" as Difficulty,
   musicVolume: 70,
   sfxVolume: 85,
