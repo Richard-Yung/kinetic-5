@@ -30,12 +30,14 @@ export interface HUDState {
   enemiesRemaining: number;
   waveIndex: number;
   totalWaves: number;
-  ultimate: number; // 0-1000
+  ultimate: number;
   objective: string;
   extracting?: boolean;
   extractProgress?: number;
   hitMarker?: { visible: boolean; crit: boolean };
   damageDirection?: { angle: number; visible: boolean } | null;
+  playerPos?: { x: number; z: number };
+  enemyPositions?: { x: number; z: number; alive: boolean }[];
 }
 
 export function HUDScreen({
@@ -53,37 +55,78 @@ export function HUDScreen({
 
   return (
     <div className="absolute inset-0 pointer-events-none z-20 select-none no-select">
-      {/* === TOP-LEFT : Minimap === */}
+      {/* === TOP-LEFT : Minimap fonctionnelle === */}
       <div className="absolute top-3 left-3 safe-top pointer-events-auto">
         {mapVisible ? (
-          <div className="relative w-32 h-32 bg-k5-panel/80 border-2 border-k5-cyan/60 rounded-sm k5-clip-sm backdrop-blur-sm k5-scanlines">
-            {/* Bordure */}
-            <div className="absolute inset-0 border border-k5-cyan/30 m-1 rounded-sm" />
-            {/* Croix centrale */}
-            <div className="absolute top-1/2 left-0 right-0 h-px bg-k5-cyan/20" />
-            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-k5-cyan/20" />
-            {/* Points d'intérêt (échantillon) */}
-            <div className="absolute top-4 left-8 w-1.5 h-1.5 bg-k5-green rounded-full k5-glow-green" />
-            <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-k5-cyan rounded-full k5-glow-cyan" style={{ transform: "translate(-50%, -50%)" }} />
-            <div className="absolute bottom-6 right-6 w-1.5 h-1.5 bg-k5-red rounded-full k5-glow-red animate-pulse" />
-            <div className="absolute bottom-3 left-10 w-1 h-1 bg-k5-yellow rounded-full" />
-            {/* Labels */}
-            <span className="absolute top-1 left-2 text-[8px] font-display text-k5-cyan">A</span>
-            <span className="absolute bottom-1 right-2 text-[8px] font-display text-k5-red">B</span>
+          <div
+            className="relative rounded-lg backdrop-blur-sm overflow-hidden"
+            style={{
+              width: "120px", height: "120px",
+              background: "rgba(10, 20, 35, 0.7)",
+              border: "1.5px solid rgba(26, 161, 206, 0.5)",
+              boxShadow: "0 0 12px rgba(26, 161, 206, 0.15), inset 0 0 8px rgba(26, 161, 206, 0.08)",
+            }}
+          >
+            {/* Grille minimap */}
+            <div className="absolute inset-0" style={{
+              backgroundImage: "linear-gradient(rgba(26, 161, 206, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 161, 206, 0.12) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
+            }} />
+
+            {/* Porte d'extraction (haut, vert) */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-1 bg-green-400 rounded-full" style={{ boxShadow: "0 0 4px #6CF42E" }} />
+
+            {/* Joueur (centre, cyan) */}
+            {hudState.playerPos && (
+              <div
+                className="absolute w-2 h-2 rounded-full"
+                style={{
+                  left: `${50 + (hudState.playerPos.x / 20) * 45}%`,
+                  top: `${50 + (hudState.playerPos.z / 20) * 45}%`,
+                  transform: "translate(-50%, -50%)",
+                  background: "#1AA1CE",
+                  boxShadow: "0 0 6px #1AA1CE",
+                }}
+              >
+                {/* Direction du joueur (triangle) */}
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-b-[5px] border-l-transparent border-r-transparent border-b-cyan-400" />
+              </div>
+            )}
+
+            {/* Ennemis (rouge, pulsants) */}
+            {hudState.enemyPositions?.filter(e => e.alive).map((e, i) => (
+              <div
+                key={i}
+                className="absolute w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{
+                  left: `${50 + (e.x / 20) * 45}%`,
+                  top: `${50 + (e.z / 20) * 45}%`,
+                  transform: "translate(-50%, -50%)",
+                  background: "#FE0022",
+                  boxShadow: "0 0 4px #FE0022",
+                }}
+              />
+            ))}
+
             {/* Bouton hide */}
             <button
               onClick={() => setMapVisible(false)}
-              className="absolute -top-1 -right-1 w-5 h-5 bg-k5-panel border border-k5-cyan rounded-sm flex items-center justify-center hover:bg-k5-cyan hover:text-k5-deep-space transition-colors"
+              className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+              style={{ background: "rgba(10, 20, 35, 0.9)", border: "1px solid rgba(26, 161, 206, 0.6)" }}
             >
-              <X className="w-3 h-3" />
+              <X className="w-3 h-3 text-cyan-400" />
             </button>
+
+            {/* Label */}
+            <div className="absolute bottom-0.5 left-1 text-[7px] font-display text-cyan-400/60">MAP</div>
           </div>
         ) : (
           <button
             onClick={() => setMapVisible(true)}
-            className="w-10 h-10 bg-k5-panel/80 border border-k5-cyan/60 rounded-sm flex items-center justify-center hover:border-k5-cyan"
+            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            style={{ background: "rgba(10, 20, 35, 0.7)", border: "1.5px solid rgba(26, 161, 206, 0.5)", backdropFilter: "blur(4px)" }}
           >
-            <MapIcon className="w-4 h-4 text-k5-cyan" />
+            <MapIcon className="w-4 h-4 text-cyan-400" />
           </button>
         )}
       </div>

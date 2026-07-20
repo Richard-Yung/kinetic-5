@@ -71,117 +71,96 @@ interface GameRefs {
    ShipEnvironment — vaisseau multi-zones navigable
    ============================================================ */
 function ShipEnvironment() {
-  const wallColor = "#1a2a3e";
-  const floorColor = "#0a1525";
+  // Palette colorée (plus noire)
+  const wallColor = "#3a4a5e";
+  const wallAccent = "#4a5a6e";
+  const floorColor = "#1a2a3e";
+  const floorAccent = "#2a3a4e";
   const accent = "#1AA1CE";
+  const accent2 = "#00CED1";
 
-  // Murs avec PORTES (ouvertures) pour permettre navigation entre zones
-  // Zone centrale (8x8) + 4 corridors vers zones cardinales
   const walls = useMemo(() => {
     const w: { pos: [number, number, number]; size: [number, number, number] }[] = [];
-    const H = 4; // hauteur
-    const T = 0.3; // épaisseur
-
-    // === Zone centrale (spawn) - 8x8 autour de l'origine ===
-    // Mur nord (avec porte centrale de 3 unités)
-    w.push({ pos: [-7, H / 2, -8], size: [4, H, T] }); // gauche porte nord
-    w.push({ pos: [7, H / 2, -8], size: [4, H, T] }); // droite porte nord
-    // Mur sud (avec porte)
+    const H = 4;
+    const T = 0.3;
+    // Zone centrale
+    w.push({ pos: [-7, H / 2, -8], size: [4, H, T] });
+    w.push({ pos: [7, H / 2, -8], size: [4, H, T] });
     w.push({ pos: [-7, H / 2, 8], size: [4, H, T] });
     w.push({ pos: [7, H / 2, 8], size: [4, H, T] });
-    // Mur est (avec porte)
     w.push({ pos: [8, H / 2, -7], size: [T, H, 4] });
     w.push({ pos: [8, H / 2, 7], size: [T, H, 4] });
-    // Mur ouest (avec porte)
     w.push({ pos: [-8, H / 2, -7], size: [T, H, 4] });
     w.push({ pos: [-8, H / 2, 7], size: [T, H, 4] });
-
-    // === Corridors vers 4 zones secondaires ===
-    // Corridor nord (vers zone nord)
+    // Corridors
     w.push({ pos: [-3, H / 2, -14], size: [T, H, 6] });
     w.push({ pos: [3, H / 2, -14], size: [T, H, 6] });
-    // Zone nord (mur fond)
     w.push({ pos: [0, H / 2, -20], size: [14, H, T] });
-
-    // Corridor sud
     w.push({ pos: [-3, H / 2, 14], size: [T, H, 6] });
     w.push({ pos: [3, H / 2, 14], size: [T, H, 6] });
     w.push({ pos: [0, H / 2, 20], size: [14, H, T] });
-
-    // Corridor est
     w.push({ pos: [14, H / 2, -3], size: [6, H, T] });
     w.push({ pos: [14, H / 2, 3], size: [6, H, T] });
     w.push({ pos: [20, H / 2, 0], size: [T, H, 14] });
-
-    // Corridor ouest
     w.push({ pos: [-14, H / 2, -3], size: [6, H, T] });
     w.push({ pos: [-14, H / 2, 3], size: [6, H, T] });
     w.push({ pos: [-20, H / 2, 0], size: [T, H, 14] });
-
-    // Murs périphériques des zones secondaires
-    // Zone nord
+    // Zones secondaires
     w.push({ pos: [-7, H / 2, -17], size: [T, H, 6] });
     w.push({ pos: [7, H / 2, -17], size: [T, H, 6] });
-    // Zone sud
     w.push({ pos: [-7, H / 2, 17], size: [T, H, 6] });
     w.push({ pos: [7, H / 2, 17], size: [T, H, 6] });
-    // Zone est
     w.push({ pos: [17, H / 2, -7], size: [6, H, T] });
     w.push({ pos: [17, H / 2, 7], size: [6, H, T] });
-    // Zone ouest
     w.push({ pos: [-17, H / 2, -7], size: [6, H, T] });
     w.push({ pos: [-17, H / 2, 7], size: [6, H, T] });
-
     return w;
   }, []);
 
-  // Caisses / couvertures réparties dans les zones
   const crates = useMemo(() => [
     { pos: [-4, 0.6, -3], size: [1.5, 1.2, 1.5] },
     { pos: [4, 0.6, 3], size: [1.5, 1.2, 1.5] },
     { pos: [-4, 0.6, 5], size: [1.5, 1.2, 1.5] },
     { pos: [4, 0.6, -5], size: [1.5, 1.2, 1.5] },
-    // Zone nord
     { pos: [0, 0.5, -16], size: [3, 1, 1] },
     { pos: [-5, 0.6, -18], size: [1.5, 1.2, 1.5] },
     { pos: [5, 0.6, -18], size: [1.5, 1.2, 1.5] },
-    // Zone sud
     { pos: [0, 0.5, 16], size: [3, 1, 1] },
-    { pos: [-5, 0.6, 18], size: [1.5, 1.2, 1.5] },
-    { pos: [5, 0.6, 18], size: [1.5, 1.2, 1.5] },
-    // Zone est
     { pos: [16, 0.5, 0], size: [1, 1, 3] },
-    { pos: [18, 0.6, -5], size: [1.5, 1.2, 1.5] },
-    { pos: [18, 0.6, 5], size: [1.5, 1.2, 1.5] },
-    // Zone ouest
     { pos: [-16, 0.5, 0], size: [1, 1, 3] },
-    { pos: [-18, 0.6, -5], size: [1.5, 1.2, 1.5] },
-    { pos: [-18, 0.6, 5], size: [1.5, 1.2, 1.5] },
-  ], []);
-
-  // Piliers
-  const pillars = useMemo(() => [
-    { pos: [-5, 1, -5] }, { pos: [5, 1, -5] },
-    { pos: [-5, 1, 5] }, { pos: [5, 1, 5] },
   ], []);
 
   return (
     <group>
-      {/* Sol central + zones */}
+      {/* Sol avec couleur visible + motifs */}
       {[
-        { pos: [0, 0, 0], size: [16, 16] },
-        { pos: [0, 0, -17], size: [14, 6] },
-        { pos: [0, 0, 17], size: [14, 6] },
-        { pos: [17, 0, 0], size: [6, 14] },
-        { pos: [-17, 0, 0], size: [6, 14] },
+        { pos: [0, 0, 0], size: [16, 16], color: floorColor },
+        { pos: [0, 0, -17], size: [14, 6], color: floorAccent },
+        { pos: [0, 0, 17], size: [14, 6], color: floorAccent },
+        { pos: [17, 0, 0], size: [6, 14], color: floorAccent },
+        { pos: [-17, 0, 0], size: [6, 14], color: floorAccent },
       ].map((f, i) => (
         <mesh key={`floor-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={f.pos as [number, number, number]} receiveShadow>
           <planeGeometry args={f.size} />
-          <meshStandardMaterial color={floorColor} metalness={0.7} roughness={0.4} />
+          <meshStandardMaterial color={f.color} metalness={0.6} roughness={0.5} />
         </mesh>
       ))}
 
-      {/* Plafond central */}
+      {/* Lignes de sol cyan (motifs visibles) */}
+      {[-7, 0, 7].map((z, i) => (
+        <mesh key={`fl-${i}`} position={[0, 0.02, z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[16, 0.12]} />
+          <meshBasicMaterial color={accent2} toneMapped={false} opacity={0.6} transparent />
+        </mesh>
+      ))}
+      {[-7, 0, 7].map((x, i) => (
+        <mesh key={`fvl-${i}`} position={[x, 0.02, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
+          <planeGeometry args={[16, 0.12]} />
+          <meshBasicMaterial color={accent2} toneMapped={false} opacity={0.6} transparent />
+        </mesh>
+      ))}
+
+      {/* Plafond */}
       {[
         { pos: [0, 4, 0], size: [16, 16] },
         { pos: [0, 4, -17], size: [14, 6] },
@@ -191,88 +170,83 @@ function ShipEnvironment() {
       ].map((f, i) => (
         <mesh key={`ceil-${i}`} rotation={[Math.PI / 2, 0, 0]} position={f.pos as [number, number, number]} receiveShadow>
           <planeGeometry args={f.size} />
-          <meshStandardMaterial color={floorColor} metalness={0.5} roughness={0.6} />
+          <meshStandardMaterial color="#152535" metalness={0.4} roughness={0.7} />
         </mesh>
       ))}
 
-      {/* Murs */}
+      {/* Murs colorés (bleu-gris visible) */}
       {walls.map((w, i) => (
         <mesh key={`wall-${i}`} position={w.pos} castShadow receiveShadow>
           <boxGeometry args={w.size} />
-          <meshStandardMaterial color={wallColor} metalness={0.6} roughness={0.5} />
+          <meshStandardMaterial color={wallColor} metalness={0.5} roughness={0.6} />
         </mesh>
       ))}
 
-      {/* Piliers */}
-      {pillars.map((p, i) => (
-        <mesh key={`pillar-${i}`} position={p.pos as [number, number, number]} castShadow>
-          <boxGeometry args={[0.6, 2, 0.6]} />
-          <meshStandardMaterial color={wallColor} metalness={0.7} roughness={0.4} />
+      {/* Bandes lumineuses sur murs (glow cyan) */}
+      {walls.slice(0, 8).map((w, i) => (
+        <mesh key={`wglow-${i}`} position={[w.pos[0], 3.2, w.pos[2]]}>
+          <boxGeometry args={[w.size[0] * 0.8, 0.15, w.size[2] * 0.8]} />
+          <meshBasicMaterial color={accent} toneMapped={false} opacity={0.7} transparent />
         </mesh>
       ))}
 
-      {/* Caisses couverture */}
+      {/* Caisses couverture colorées */}
       {crates.map((c, i) => (
         <mesh key={`crate-${i}`} position={c.pos as [number, number, number]} castShadow>
           <boxGeometry args={c.size as [number, number, number]} />
-          <meshStandardMaterial color="#2a3a4e" metalness={0.5} roughness={0.7} />
+          <meshStandardMaterial color="#3a4a5e" metalness={0.5} roughness={0.6} />
         </mesh>
       ))}
 
-      {/* Lignes lumineuses au sol (cyan) */}
-      {[-15, -5, 5, 15].map((z, i) => (
-        <mesh key={`line-h-${i}`} position={[0, 0.02, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[16, 0.08]} />
-          <meshBasicMaterial color={accent} toneMapped={false} />
-        </mesh>
-      ))}
-      {[-15, -5, 5, 15].map((x, i) => (
-        <mesh key={`line-v-${i}`} position={[x, 0.02, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-          <planeGeometry args={[16, 0.08]} />
-          <meshBasicMaterial color={accent} toneMapped={false} />
-        </mesh>
-      ))}
-
-      {/* Panneaux lumineux muraux (haut) */}
-      {Array.from({ length: 16 }).map((_, i) => {
-        const angle = (i / 16) * Math.PI * 2;
-        const r = 7.5;
-        const x = Math.cos(angle) * r;
-        const z = Math.sin(angle) * r;
-        return (
-          <mesh key={`panel-${i}`} position={[x, 3.5, z]} rotation={[0, -angle + Math.PI / 2, 0]}>
-            <planeGeometry args={[2, 0.4]} />
-            <meshBasicMaterial color={accent} toneMapped={false} opacity={0.9} transparent />
+      {/* Portes encadrées (4 portes cardinales) avec glow */}
+      {[
+        { pos: [0, 2, -8] as [number, number, number], rot: 0 },
+        { pos: [0, 2, 8] as [number, number, number], rot: Math.PI },
+        { pos: [8, 2, 0] as [number, number, number], rot: -Math.PI / 2 },
+        { pos: [-8, 2, 0] as [number, number, number], rot: Math.PI / 2 },
+      ].map((d, i) => (
+        <group key={`door-${i}`} position={d.pos} rotation={[0, d.rot, 0]}>
+          {/* Cadre haut */}
+          <mesh position={[0, 1.8, 0]}>
+            <boxGeometry args={[3.2, 0.15, 0.1]} />
+            <meshBasicMaterial color={accent} toneMapped={false} />
           </mesh>
-        );
-      })}
+          {/* Cadre gauche */}
+          <mesh position={[-1.6, 0, 0]}>
+            <boxGeometry args={[0.15, 3.6, 0.1]} />
+            <meshBasicMaterial color={accent} toneMapped={false} opacity={0.6} transparent />
+          </mesh>
+          {/* Cadre droit */}
+          <mesh position={[1.6, 0, 0]}>
+            <boxGeometry args={[0.15, 3.6, 0.1]} />
+            <meshBasicMaterial color={accent} toneMapped={false} opacity={0.6} transparent />
+          </mesh>
+        </group>
+      ))}
 
-      {/* Porte d'extraction (zone nord fond) - verte et voyante */}
+      {/* Porte d'extraction (zone nord fond) - verte voyante */}
       <group position={[0, 2, -19.85]}>
         <mesh>
           <planeGeometry args={[4, 3.6]} />
-          <meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.4} transparent />
+          <meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.35} transparent />
         </mesh>
-        <mesh position={[0, 0, 0.05]}>
-          <planeGeometry args={[3.6, 3.2]} />
-          <meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.2} transparent />
-        </mesh>
-        {/* Cadre */}
         <mesh position={[-2, 0, 0.1]}><boxGeometry args={[0.15, 3.8, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
         <mesh position={[2, 0, 0.1]}><boxGeometry args={[0.15, 3.8, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
         <mesh position={[0, 1.9, 0.1]}><boxGeometry args={[4.15, 0.15, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
       </group>
-      {/* Texte extraction au-dessus de la porte */}
-      <mesh position={[0, 3.8, -19.7]}>
-        <planeGeometry args={[3, 0.4]} />
-        <meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.8} transparent />
-      </mesh>
 
-      {/* Supply cache (zone est) */}
-      <mesh position={[18, 0.4, 0]} castShadow>
-        <boxGeometry args={[1.5, 0.8, 1.5]} />
-        <meshStandardMaterial color="#FFE735" emissive="#FFE735" emissiveIntensity={0.3} metalness={0.6} roughness={0.4} />
-      </mesh>
+      {/* Écrans muraux (décorations colorées) */}
+      {[
+        { pos: [-7.8, 2, 0], rot: [0, Math.PI / 2, 0], color: "#1AA1CE" },
+        { pos: [7.8, 2, 0], rot: [0, -Math.PI / 2, 0], color: "#00CED1" },
+        { pos: [0, 2, -7.8], rot: [0, 0, 0], color: "#A855F7" },
+        { pos: [0, 2, 7.8], rot: [0, Math.PI, 0], color: "#FFE735" },
+      ].map((s, i) => (
+        <mesh key={`screen-${i}`} position={s.pos as [number, number, number]} rotation={s.rot as [number, number, number]}>
+          <planeGeometry args={[1.5, 1]} />
+          <meshBasicMaterial color={s.color} toneMapped={false} opacity={0.4} transparent />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -496,36 +470,74 @@ function WeaponViewmodel({
   });
 
   return (
-    <group ref={ref} position={[0.25, -0.28, -0.55]}>
+    <group ref={ref} position={[0.28, -0.30, -0.60]}>
+      {/* Corps principal de l'arme — détaillé */}
       <mesh>
-        <boxGeometry args={[0.08, isPistol ? 0.1 : 0.14, isPistol ? 0.3 : 0.55]} />
-        <meshStandardMaterial color="#2a3a4e" metalness={0.8} roughness={0.3} />
+        <boxGeometry args={[0.09, 0.13, isPistol ? 0.32 : 0.58]} />
+        <meshStandardMaterial color="#2a3a4e" metalness={0.85} roughness={0.25} />
       </mesh>
-      <mesh position={[0, isPistol ? 0.02 : 0.03, isPistol ? -0.2 : -0.32]}>
-        <boxGeometry args={[0.04, 0.04, 0.2]} />
-        <meshStandardMaterial color="#0a0a0a" metalness={0.9} roughness={0.2} />
+      {/* Canon */}
+      <mesh position={[0, 0.03, isPistol ? -0.22 : -0.35]}>
+        <boxGeometry args={[0.05, 0.05, 0.22]} />
+        <meshStandardMaterial color="#0a0a0a" metalness={0.9} roughness={0.15} />
       </mesh>
-      <mesh position={[0, -0.12, 0.1]} rotation={[0.3, 0, 0]}>
-        <boxGeometry args={[0.06, 0.14, 0.08]} />
-        <meshStandardMaterial color="#2a3a4e" metalness={0.7} roughness={0.4} />
+      {/* Bout du canon (orange/rouge) */}
+      <mesh position={[0, 0.03, isPistol ? -0.34 : -0.48]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.06, 8]} rotation={[Math.PI / 2, 0, 0]} />
+        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.2} />
       </mesh>
-      <mesh position={[0, -0.1, -0.05]}>
-        <boxGeometry args={[0.05, 0.1, 0.12]} />
+      {/* Poignée */}
+      <mesh position={[0, -0.14, 0.12]} rotation={[0.35, 0, 0]}>
+        <boxGeometry args={[0.07, 0.16, 0.09]} />
+        <meshStandardMaterial color="#1a2a3e" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* Chargeur */}
+      <mesh position={[0, -0.12, -0.05]}>
+        <boxGeometry args={[0.06, 0.12, 0.14]} />
         <meshStandardMaterial color="#1a1a1a" metalness={0.6} roughness={0.5} />
       </mesh>
-      <mesh position={[0, 0.1, 0]}>
-        <boxGeometry args={[0.02, 0.04, 0.02]} />
+      {/* Viseur (scope) */}
+      <mesh position={[0, 0.12, 0.05]}>
+        <boxGeometry args={[0.05, 0.06, 0.15]} />
+        <meshStandardMaterial color="#1a2a3e" metalness={0.8} roughness={0.3} />
+      </mesh>
+      {/* Lente du scope (glow cyan) */}
+      <mesh position={[0, 0.12, -0.04]}>
+        <circleGeometry args={[0.025, 8]} />
+        <meshBasicMaterial color="#00CED1" toneMapped={false} />
+      </mesh>
+      {/* Bande lumineuse supérieure (glow cyan) */}
+      <mesh position={[0, 0.07, 0]}>
+        <boxGeometry args={[0.03, 0.015, isPistol ? 0.25 : 0.45]} />
+        <meshBasicMaterial color="#00CED1" toneMapped={false} />
+      </mesh>
+      {/* Bande lumineuse latérale (glow cyan) */}
+      <mesh position={[0.05, 0, 0]}>
+        <boxGeometry args={[0.015, 0.04, isPistol ? 0.2 : 0.38]} />
+        <meshBasicMaterial color="#1AA1CE" toneMapped={false} opacity={0.8} transparent />
+      </mesh>
+      {/* Détail pontet */}
+      <mesh position={[0, -0.05, 0.05]} rotation={[0.2, 0, 0]}>
+        <torusGeometry args={[0.04, 0.012, 6, 12, Math.PI]} />
+        <meshStandardMaterial color="#1a2a3e" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* Indicateur élément (glow couleur) */}
+      <mesh position={[0, -0.02, 0.08]}>
+        <boxGeometry args={[0.03, 0.03, 0.03]} />
         <meshBasicMaterial color="#1AA1CE" toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0, 0.05]}>
-        <boxGeometry args={[0.02, 0.02, isPistol ? 0.2 : 0.35]} />
-        <meshBasicMaterial color="#1AA1CE" toneMapped={false} />
-      </mesh>
+      {/* Muzzle flash */}
       {shooting && (
-        <mesh position={[0, 0.02, isPistol ? -0.4 : -0.5]}>
-          <sphereGeometry args={[0.1, 6, 6]} />
-          <meshBasicMaterial color="#FFE735" toneMapped={false} transparent opacity={0.9} />
-        </mesh>
+        <>
+          <mesh position={[0, 0.03, isPistol ? -0.40 : -0.55]}>
+            <sphereGeometry args={[0.12, 6, 6]} />
+            <meshBasicMaterial color="#FFE735" toneMapped={false} transparent opacity={0.9} />
+          </mesh>
+          <mesh position={[0, 0.03, isPistol ? -0.45 : -0.60]}>
+            <sphereGeometry args={[0.06, 6, 6]} />
+            <meshBasicMaterial color="#FFFFFF" toneMapped={false} transparent opacity={0.8} />
+          </mesh>
+        </>
       )}
     </group>
   );
@@ -803,6 +815,14 @@ export function FPSGame({ onExit }: { onExit: () => void }) {
 
   const enemies = useRef<EnemyInstance[]>([]);
   const [, forceUpdate] = useState(0);
+
+  // Rafraîchit le HUD toutes les 100ms pour la minimap en temps réel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      forceUpdate(n => n + 1);
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
   const enemyIdCounter = useRef(0);
 
   const diffMult = difficulty === "easy" ? 0.7 : difficulty === "hard" ? 1.4 : 1;
@@ -1068,6 +1088,8 @@ export function FPSGame({ onExit }: { onExit: () => void }) {
     objective: mission.objectives[0]?.description ?? mission.displayName,
     hitMarker,
     damageDirection,
+    playerPos: { x: playerPos.current.x, z: playerPos.current.z },
+    enemyPositions: enemies.current.map(e => ({ x: e.position.x, z: e.position.z, alive: e.alive })),
   };
 
   return (
@@ -1079,16 +1101,16 @@ export function FPSGame({ onExit }: { onExit: () => void }) {
         camera={{ fov: 75, near: 0.1, far: 100, position: [0, 1.6, 5] }}
         frameloop="always"
       >
-        <color attach="background" args={["#05060F"]} />
-        <fog attach="fog" args={["#05060F", 30, 70]} />
-        <ambientLight intensity={0.8} color="#4A90B0" />
-        <pointLight position={[0, 3.5, 0]} intensity={2.5} color="#1AA1CE" distance={25} />
-        <pointLight position={[0, 3.5, -17]} intensity={2.0} color="#1AA1CE" distance={20} />
-        <pointLight position={[0, 3.5, 17]} intensity={2.0} color="#6CF42E" distance={20} />
-        <pointLight position={[17, 3.5, 0]} intensity={2.0} color="#FFE735" distance={20} />
-        <pointLight position={[-17, 3.5, 0]} intensity={2.0} color="#A855F7" distance={20} />
-        <hemisphereLight args={["#1AA1CE", "#05060F", 0.6]} />
-        <directionalLight position={[5, 10, 5]} intensity={0.5} color="#FFFFFF" />
+        <color attach="background" args={["#0a1525"]} />
+        <fog attach="fog" args={["#0a1525", 35, 80]} />
+        <ambientLight intensity={1.2} color="#5A90B0" />
+        <pointLight position={[0, 3.5, 0]} intensity={3.0} color="#1AA1CE" distance={30} />
+        <pointLight position={[0, 3.5, -17]} intensity={2.5} color="#1AA1CE" distance={25} />
+        <pointLight position={[0, 3.5, 17]} intensity={2.5} color="#6CF42E" distance={25} />
+        <pointLight position={[17, 3.5, 0]} intensity={2.5} color="#FFE735" distance={25} />
+        <pointLight position={[-17, 3.5, 0]} intensity={2.5} color="#A855F7" distance={25} />
+        <hemisphereLight args={["#4A90B0", "#1a2a3e", 0.8]} />
+        <directionalLight position={[5, 10, 5]} intensity={0.8} color="#FFFFFF" />
 
         <ShipEnvironment />
 

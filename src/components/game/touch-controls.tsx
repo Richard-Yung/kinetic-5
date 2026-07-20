@@ -3,10 +3,8 @@
 /* eslint-disable react-hooks/immutability -- refs mutables pour contrôles */
 
 /**
- * KINETICS 5 — Contrôles tactiles TOUJOURS VISIBLES
- * Joystick gauche + boutons droits (FIRE/AIM/RELOAD/GRENADE/SWITCH/JUMP/SPRINT)
- * Visible sur desktop ET mobile (pour test + cohérence avec PDF page 6)
- * Sur desktop : WASD + souris fonctionnent EN PLUS des boutons
+ * KINETICS 5 — Contrôles tactiles épurés (style mission 2+)
+ * D-pad circulaire avec flèches directionnelles + bouton FIRE raffiné
  */
 
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
@@ -42,20 +40,16 @@ export function TouchControls({
   const [joystickActive, setJoystickActive] = useState(false);
   const [fireActive, setFireActive] = useState(false);
   const [aimActive, setAimActive] = useState(false);
-  const [sprintActive, setSprintActive] = useState(false);
   const joystickOrigin = useRef({ x: 0, y: 0 });
   const lookTouchId = useRef<number | null>(null);
   const lookLastPos = useRef({ x: 0, y: 0 });
 
-  // Détection desktop vs mobile
   const [isTouch, setIsTouch] = useState(false);
   useEffect(() => {
-    setIsTouch(
-      "ontouchstart" in window || navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches
-    );
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches);
   }, []);
 
-  // Joystick (touch) handlers
+  // Joystick handlers
   const handleJoystickStart = (e: React.TouchEvent) => {
     e.preventDefault();
     const touch = e.touches[0];
@@ -68,14 +62,13 @@ export function TouchControls({
     const touch = e.touches[0];
     const dx = touch.clientX - joystickOrigin.current.x;
     const dy = touch.clientY - joystickOrigin.current.y;
-    const maxRadius = 50;
+    const maxRadius = 45;
     const dist = Math.min(Math.sqrt(dx * dx + dy * dy), maxRadius);
     const angle = Math.atan2(dy, dx);
     const x = Math.cos(angle) * dist;
     const y = Math.sin(angle) * dist;
     setJoystickPos({ x, y });
     gameRefs.current.joystick = { x: x / maxRadius, y: y / maxRadius };
-    // Appliquer au move
     gameRefs.current.move.x = x / maxRadius;
     gameRefs.current.move.y = y / maxRadius;
   };
@@ -113,18 +106,9 @@ export function TouchControls({
     }
   };
 
-  // Boutons press handlers (touch + mouse)
-  const press = (key: keyof GameRefs, val: boolean, setter?: (v: boolean) => void) => ({
-    onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); (gameRefs.current as any)[key] = val; setter?.(val); },
-    onTouchEnd: (e: React.TouchEvent) => { e.preventDefault(); (gameRefs.current as any)[key] = !val; setter?.(!val); },
-    onMouseDown: (e: React.MouseEvent) => { e.preventDefault(); (gameRefs.current as any)[key] = val; setter?.(val); },
-    onMouseUp: (e: React.MouseEvent) => { e.preventDefault(); (gameRefs.current as any)[key] = !val; setter?.(!val); },
-    onMouseLeave: (e: React.MouseEvent) => { if ((gameRefs.current as any)[key] === val) { (gameRefs.current as any)[key] = !val; setter?.(!val); } },
-  });
-
   return (
     <div className="absolute inset-0 z-30 pointer-events-none select-none no-select">
-      {/* Zone de look tactile (moitié droite, derrière les boutons) */}
+      {/* Zone de look (moitié droite) */}
       {isTouch && (
         <div
           className="absolute top-0 right-0 bottom-0 w-1/2 pointer-events-auto"
@@ -135,14 +119,14 @@ export function TouchControls({
         />
       )}
 
-      {/* === JOYSTICK GAUCHE === */}
+      {/* === D-PAD CIRCULAIRE (bas-gauche) === */}
       <div
-        className="absolute bottom-24 left-6 w-32 h-32 pointer-events-auto"
+        className="absolute pointer-events-auto"
+        style={{ bottom: "20px", left: "20px", width: "120px", height: "120px" }}
         onTouchStart={isTouch ? handleJoystickStart : undefined}
         onTouchMove={isTouch ? handleJoystickMove : undefined}
         onTouchEnd={isTouch ? handleJoystickEnd : undefined}
         onTouchCancel={isTouch ? handleJoystickEnd : undefined}
-        // Sur desktop : clic + drag = joystick
         onMouseDown={!isTouch ? (e) => {
           joystickOrigin.current = { x: e.clientX, y: e.clientY };
           setJoystickActive(true);
@@ -150,14 +134,12 @@ export function TouchControls({
         onMouseMove={!isTouch && joystickActive ? (e) => {
           const dx = e.clientX - joystickOrigin.current.x;
           const dy = e.clientY - joystickOrigin.current.y;
-          const maxRadius = 50;
+          const maxRadius = 45;
           const dist = Math.min(Math.sqrt(dx * dx + dy * dy), maxRadius);
           const angle = Math.atan2(dy, dx);
-          const x = Math.cos(angle) * dist;
-          const y = Math.sin(angle) * dist;
-          setJoystickPos({ x, y });
-          gameRefs.current.move.x = x / maxRadius;
-          gameRefs.current.move.y = y / maxRadius;
+          setJoystickPos({ x: Math.cos(angle) * dist, y: Math.sin(angle) * dist });
+          gameRefs.current.move.x = Math.cos(angle) * dist / maxRadius;
+          gameRefs.current.move.y = Math.sin(angle) * dist / maxRadius;
         } : undefined}
         onMouseUp={!isTouch ? () => {
           setJoystickActive(false);
@@ -172,119 +154,175 @@ export function TouchControls({
           gameRefs.current.move.y = 0;
         } : undefined}
       >
-        {/* Cercle externe */}
-        <div className="absolute inset-0 rounded-full border-2 border-k5-cyan/50 bg-k5-panel/40 backdrop-blur-sm" />
-        {/* Croix directionnelle */}
-        <div className="absolute top-1/2 left-0 right-0 h-px bg-k5-cyan/20" />
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-k5-cyan/20" />
-        {/* Knob */}
+        {/* Cercle externe — épuré, bordure fine */}
         <div
-          className="absolute top-1/2 left-1/2 w-14 h-14 rounded-full border-2 border-k5-cyan bg-k5-cyan/30 backdrop-blur-sm flex items-center justify-center transition-transform"
+          className="absolute inset-0 rounded-full"
           style={{
+            background: "rgba(10, 20, 35, 0.4)",
+            border: "2px solid rgba(26, 161, 206, 0.4)",
+            boxShadow: "inset 0 0 12px rgba(26, 161, 206, 0.1)",
+            backdropFilter: "blur(4px)",
+          }}
+        />
+
+        {/* Flèches directionnelles (4) */}
+        <div className="absolute top-1 left-1/2 -translate-x-1/2 text-cyan-400/50 text-xs">▲</div>
+        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-cyan-400/50 text-xs">▼</div>
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 text-cyan-400/50 text-xs">◄</div>
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 text-cyan-400/50 text-xs">►</div>
+
+        {/* Knob central — épuré */}
+        <div
+          className="absolute top-1/2 left-1/2 rounded-full transition-transform"
+          style={{
+            width: "50px",
+            height: "50px",
             transform: `translate(calc(-50% + ${joystickPos.x}px), calc(-50% + ${joystickPos.y}px))`,
-            boxShadow: joystickActive ? "0 0 16px #1AA1CE" : "0 0 8px #1AA1CE66",
+            background: "rgba(26, 161, 206, 0.3)",
+            border: "2px solid rgba(26, 161, 206, 0.8)",
+            boxShadow: joystickActive ? "0 0 16px rgba(26, 161, 206, 0.6)" : "0 0 6px rgba(26, 161, 206, 0.3)",
+            backdropFilter: "blur(4px)",
           }}
         >
-          <div className="w-2 h-2 rounded-full bg-k5-cyan" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-cyan-300" />
         </div>
-        {/* Label */}
-        <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] font-display text-k5-cyan/70 tracking-wider">MOVE</div>
       </div>
 
-      {/* === BOUTONS DROITS === */}
-      <div className="absolute bottom-24 right-4 flex flex-col items-end gap-2 pointer-events-auto">
+      {/* === BOUTONS DROITS — épurés === */}
+      <div className="absolute pointer-events-auto flex flex-col items-end gap-2" style={{ bottom: "20px", right: "20px" }}>
         {/* Ligne 1 : GRENADE + AIM + FIRE */}
         <div className="flex items-end gap-2">
+          {/* Grenade — petit, transparent */}
           <button
-            className="w-12 h-12 rounded-full border-2 border-k5-green/70 bg-k5-green/20 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
-            {...press("grenade", true)}
-            style={{ touchAction: "none" }}
+            className="rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{
+              width: "44px", height: "44px",
+              background: "rgba(108, 244, 46, 0.15)",
+              border: "1.5px solid rgba(108, 244, 46, 0.5)",
+              backdropFilter: "blur(4px)",
+            }}
+            onTouchStart={(e) => { e.preventDefault(); gameRefs.current.grenade = true; setTimeout(() => gameRefs.current.grenade = false, 100); }}
+            onClick={() => { gameRefs.current.grenade = true; setTimeout(() => gameRefs.current.grenade = false, 100); }}
           >
-            <span className="text-[8px] font-display text-k5-green leading-tight text-center">GRN<br/>G</span>
+            <span className="text-[8px] font-display text-green-400">GRN</span>
           </button>
+
+          {/* AIM — moyen, transparent */}
           <button
-            className={`w-14 h-14 rounded-full border-2 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform ${aimActive ? "border-k5-yellow bg-k5-yellow/40" : "border-k5-yellow/70 bg-k5-yellow/20"}`}
+            className={`rounded-full flex items-center justify-center transition-all active:scale-90 ${aimActive ? "bg-yellow-400/30 border-yellow-400" : ""}`}
+            style={{
+              width: "52px", height: "52px",
+              background: aimActive ? "rgba(255, 231, 53, 0.3)" : "rgba(255, 231, 53, 0.12)",
+              border: `1.5px solid ${aimActive ? "#FFE735" : "rgba(255, 231, 53, 0.5)"}`,
+              backdropFilter: "blur(4px)",
+            }}
             onTouchStart={(e) => { e.preventDefault(); gameRefs.current.aim = !gameRefs.current.aim; setAimActive(gameRefs.current.aim); }}
             onClick={() => { gameRefs.current.aim = !gameRefs.current.aim; setAimActive(gameRefs.current.aim); }}
-            style={{ touchAction: "none" }}
           >
-            <span className="text-[8px] font-display text-k5-yellow leading-tight text-center">AIM<br/>E</span>
+            <span className="text-[8px] font-display text-yellow-400">AIM</span>
           </button>
+
+          {/* FIRE — grand, visible */}
           <button
-            className={`w-20 h-20 rounded-full border-2 border-k5-red backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform ${fireActive ? "bg-k5-red/60 border-k5-red" : "bg-k5-red/30"}`}
-            style={{ boxShadow: fireActive ? "0 0 24px #FE0022" : "0 0 12px #FE002266", touchAction: "none" }}
-            {...press("shoot", true, setFireActive)}
+            className={`rounded-full flex items-center justify-center transition-all active:scale-90 ${fireActive ? "brightness-125" : ""}`}
+            style={{
+              width: "72px", height: "72px",
+              background: fireActive ? "rgba(254, 0, 34, 0.5)" : "rgba(254, 0, 34, 0.25)",
+              border: "2px solid rgba(254, 0, 34, 0.8)",
+              boxShadow: fireActive ? "0 0 24px rgba(254, 0, 34, 0.6)" : "0 0 8px rgba(254, 0, 34, 0.3)",
+              backdropFilter: "blur(4px)",
+            }}
+            onTouchStart={(e) => { e.preventDefault(); gameRefs.current.shoot = true; setFireActive(true); }}
+            onTouchEnd={(e) => { e.preventDefault(); gameRefs.current.shoot = false; setFireActive(false); }}
+            onMouseDown={(e) => { e.preventDefault(); gameRefs.current.shoot = true; setFireActive(true); }}
+            onMouseUp={(e) => { e.preventDefault(); gameRefs.current.shoot = false; setFireActive(false); }}
+            onMouseLeave={() => { if (fireActive) { gameRefs.current.shoot = false; setFireActive(false); } }}
           >
             <span className="text-xs font-display text-white">FIRE</span>
           </button>
         </div>
-        {/* Ligne 2 : SWITCH + RELOAD + JUMP */}
+
+        {/* Ligne 2 : SWITCH + RELOAD + SPRINT + JUMP */}
         <div className="flex items-end gap-2">
           <button
-            className="w-12 h-12 rounded-full border-2 border-k5-purple/70 bg-k5-purple/20 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
+            className="rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{ width: "40px", height: "40px", background: "rgba(168, 85, 247, 0.12)", border: "1.5px solid rgba(168, 85, 247, 0.5)", backdropFilter: "blur(4px)" }}
             onClick={() => {
               const next = weaponSlot === 1 ? 2 : weaponSlot === 2 ? 3 : 1;
               onSwitchWeapon(next);
             }}
-            style={{ touchAction: "none" }}
           >
-            <span className="text-[8px] font-display text-k5-purple leading-tight text-center">SWP<br/>1·2·3</span>
+            <span className="text-[7px] font-display text-purple-400">SWP</span>
           </button>
           <button
-            className="w-12 h-12 rounded-full border-2 border-k5-cyan/70 bg-k5-cyan/20 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
+            className="rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{ width: "40px", height: "40px", background: "rgba(26, 161, 206, 0.12)", border: "1.5px solid rgba(26, 161, 206, 0.5)", backdropFilter: "blur(4px)" }}
             onTouchStart={(e) => { e.preventDefault(); gameRefs.current.reload = true; setTimeout(() => gameRefs.current.reload = false, 100); }}
             onClick={() => { gameRefs.current.reload = true; setTimeout(() => gameRefs.current.reload = false, 100); }}
-            style={{ touchAction: "none" }}
           >
-            <span className="text-[8px] font-display text-k5-cyan leading-tight text-center">RLD<br/>R</span>
+            <span className="text-[7px] font-display text-cyan-400">RLD</span>
           </button>
           <button
-            className={`w-14 h-14 rounded-full border-2 border-k5-cyan/70 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform ${sprintActive ? "bg-k5-cyan/50" : "bg-k5-cyan/20"}`}
-            {...press("sprint", true, setSprintActive)}
-            style={{ touchAction: "none" }}
+            className="rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{ width: "44px", height: "44px", background: "rgba(26, 161, 206, 0.12)", border: "1.5px solid rgba(26, 161, 206, 0.5)", backdropFilter: "blur(4px)" }}
+            onTouchStart={(e) => { e.preventDefault(); gameRefs.current.sprint = true; }}
+            onTouchEnd={(e) => { e.preventDefault(); gameRefs.current.sprint = false; }}
+            onMouseDown={(e) => { e.preventDefault(); gameRefs.current.sprint = true; }}
+            onMouseUp={(e) => { e.preventDefault(); gameRefs.current.sprint = false; }}
           >
-            <span className="text-[8px] font-display text-k5-cyan leading-tight text-center">SPR<br/>⇧</span>
+            <span className="text-[7px] font-display text-cyan-400">SPR</span>
           </button>
           <button
-            className="w-14 h-14 rounded-full border-2 border-k5-cyan/70 bg-k5-cyan/20 backdrop-blur-sm flex items-center justify-center active:scale-90 transition-transform"
-            {...press("jump", true)}
-            style={{ touchAction: "none" }}
+            className="rounded-full flex items-center justify-center transition-all active:scale-90"
+            style={{ width: "44px", height: "44px", background: "rgba(26, 161, 206, 0.12)", border: "1.5px solid rgba(26, 161, 206, 0.5)", backdropFilter: "blur(4px)" }}
+            onTouchStart={(e) => { e.preventDefault(); gameRefs.current.jump = true; }}
+            onTouchEnd={(e) => { e.preventDefault(); gameRefs.current.jump = false; }}
+            onMouseDown={(e) => { e.preventDefault(); gameRefs.current.jump = true; }}
+            onMouseUp={(e) => { e.preventDefault(); gameRefs.current.jump = false; }}
           >
-            <span className="text-[8px] font-display text-k5-cyan leading-tight text-center">JMP<br/>␣</span>
+            <span className="text-[7px] font-display text-cyan-400">JMP</span>
           </button>
         </div>
       </div>
 
-      {/* === Indicateur arme (bas-centre, sous le HUD) === */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-auto">
+      {/* Indicateur arme (bas-centre) */}
+      <div className="absolute pointer-events-auto flex gap-1" style={{ bottom: "10px", left: "50%", transform: "translateX(-50%)" }}>
         {([
-          { slot: 1 as const, label: "1·PRI" },
-          { slot: 2 as const, label: "2·SEC" },
-          { slot: 3 as const, label: "3·TAC" },
+          { slot: 1 as const, label: "1" },
+          { slot: 2 as const, label: "2" },
+          { slot: 3 as const, label: "3" },
         ]).map((w) => (
           <button
             key={w.slot}
             onClick={() => onSwitchWeapon(w.slot)}
-            className={`px-2 py-1 text-[9px] font-display rounded-sm border ${weaponSlot === w.slot ? "bg-k5-cyan text-k5-deep-space border-k5-cyan" : "bg-k5-panel/60 text-k5-muted border-k5-border"}`}
+            className="rounded-full transition-all"
+            style={{
+              width: "28px", height: "28px",
+              background: weaponSlot === w.slot ? "rgba(26, 161, 206, 0.5)" : "rgba(10, 20, 35, 0.5)",
+              border: weaponSlot === w.slot ? "1.5px solid #1AA1CE" : "1px solid rgba(26, 161, 206, 0.3)",
+              color: weaponSlot === w.slot ? "#FFFFFF" : "#6B8CAE",
+              fontSize: "10px",
+              fontFamily: "var(--font-audiowide)",
+              backdropFilter: "blur(4px)",
+            }}
           >
             {w.label}
           </button>
         ))}
       </div>
 
-      {/* === Aide contrôles desktop === */}
+      {/* Aide contrôles desktop */}
       {!isTouch && (
-        <div className="absolute top-1/2 left-3 -translate-y-1/2 bg-k5-panel/70 border border-k5-cyan/30 px-2 py-1.5 rounded-sm text-[8px] text-k5-muted leading-relaxed pointer-events-none">
-          <div className="font-display text-k5-cyan text-[9px] mb-0.5">CONTROLES</div>
-          <div>ZQSD/WASD : bouger</div>
-          <div>Souris : regarder</div>
-          <div>Clic G : tirer</div>
-          <div>Clic D : viser</div>
-          <div>R : recharger</div>
-          <div>G : grenade</div>
-          <div>1/2/3 : arme</div>
-          <div>Espace : saut</div>
-          <div>Shift : sprint</div>
+        <div className="absolute pointer-events-none" style={{ top: "50%", left: "10px", transform: "translateY(-50%)" }}>
+          <div className="bg-black/50 backdrop-blur-sm rounded px-2 py-1.5 text-[7px] text-cyan-300/70 leading-relaxed border border-cyan-500/20">
+            <div className="font-display text-cyan-400 text-[8px] mb-0.5">CONTROLS</div>
+            <div>WASD: move</div>
+            <div>Mouse: look</div>
+            <div>Click: fire</div>
+            <div>R: reload | G: grenade</div>
+            <div>1/2/3: weapon</div>
+            <div>Space: jump | Shift: sprint</div>
+          </div>
         </div>
       )}
     </div>
