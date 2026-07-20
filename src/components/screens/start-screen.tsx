@@ -22,8 +22,8 @@ export function StartScreen() {
 
   const menu = [
     { id: "new", label: t(language, "start.newGame"), action: () => setScreen("loading"), primary: true },
-    { id: "continue", label: t(language, "start.continue"), action: () => setScreen("lobby") },
-    { id: "load", label: t(language, "start.loadGame"), action: () => setScreen("lobby") },
+    { id: "continue", label: t(language, "start.continue"), action: () => setScreen("mission_select") },
+    { id: "load", label: t(language, "start.loadGame"), action: () => setScreen("mission_select") },
     { id: "options", label: t(language, "start.options"), action: () => setScreen("settings") },
     { id: "quit", label: t(language, "start.quit"), action: () => window.close() },
   ];

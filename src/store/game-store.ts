@@ -18,6 +18,7 @@ export type ScreenName =
   | "start"
   | "loading"
   | "lobby"
+  | "mission_select"
   | "loadout"
   | "armory"
   | "mission"

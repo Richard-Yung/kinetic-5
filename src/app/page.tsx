@@ -10,6 +10,7 @@ import { useGameStore } from "@/store/game-store";
 import { StartScreen } from "@/components/screens/start-screen";
 import { LoadingScreen } from "@/components/screens/loading-screen";
 import { LobbyScreen } from "@/components/screens/lobby-screen";
+import { MissionSelectScreen } from "@/components/screens/mission-select-screen";
 import { LoadoutScreen } from "@/components/screens/loadout-screen";
 import { FPSGame } from "@/components/game/fps-game";
 import { VictoryDefeatScreen } from "@/components/screens/victory-defeat-screen";
@@ -30,7 +31,8 @@ export default function Home() {
       case "loading":
         return <LoadingScreen />;
       case "lobby":
-        return <LobbyScreen />;
+      case "mission_select":
+        return <MissionSelectScreen />;
       case "loadout":
       case "armory":
         return <LoadoutScreen />;
