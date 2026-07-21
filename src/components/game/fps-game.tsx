@@ -70,181 +70,286 @@ interface GameRefs {
 /* ============================================================
    ShipEnvironment — vaisseau multi-zones navigable
    ============================================================ */
+/* ============================================================
+   Géométrie du niveau — définie au niveau module pour collision + rendu
+   Architecture de forteresse : hub central + 4 ailes + piliers
+   ============================================================ */
+export interface Box { min: [number, number, number]; max: [number, number, number]; color: string; mat: "steel" | "concrete" | "panel" | "metal"; }
+
+// Murs solides (collision + rendu). Coordonnées monde.
+const LEVEL_WALLS: Box[] = [
+  // === Hub central (pièce 12x12, origine) — 4 murs avec portes centrales ===
+  // Nord (z=-6), porte x=[-1.5,1.5]
+  { min: [-6, 0, -6.2], max: [-1.5, 4, -5.9], color: "#4a5560", mat: "steel" },
+  { min: [1.5, 0, -6.2], max: [6, 4, -5.9], color: "#4a5560", mat: "steel" },
+  // Sud (z=6)
+  { min: [-6, 0, 5.9], max: [-1.5, 4, 6.2], color: "#4a5560", mat: "steel" },
+  { min: [1.5, 0, 5.9], max: [6, 4, 6.2], color: "#4a5560", mat: "steel" },
+  // Est (x=6)
+  { min: [5.9, 0, -6], max: [6.2, 4, -1.5], color: "#4a5560", mat: "steel" },
+  { min: [5.9, 0, 1.5], max: [6.2, 4, 6], color: "#4a5560", mat: "steel" },
+  // Ouest (x=-6)
+  { min: [-6.2, 0, -6], max: [-5.9, 4, -1.5], color: "#4a5560", mat: "steel" },
+  { min: [-6.2, 0, 1.5], max: [-5.9, 4, 6], color: "#4a5560", mat: "steel" },
+
+  // === Couloir Nord (z=-6 à z=-12, x=[-2,2]) ===
+  { min: [-2.2, 0, -12], max: [-1.9, 4, -6], color: "#3a4250", mat: "metal" },
+  { min: [1.9, 0, -12], max: [2.2, 4, -6], color: "#3a4250", mat: "metal" },
+  // === Couloir Sud ===
+  { min: [-2.2, 0, 6], max: [-1.9, 4, 12], color: "#3a4250", mat: "metal" },
+  { min: [1.9, 0, 6], max: [2.2, 4, 12], color: "#3a4250", mat: "metal" },
+  // === Couloir Est ===
+  { min: [6, 0, -2.2], max: [12, 4, -1.9], color: "#3a4250", mat: "metal" },
+  { min: [6, 0, 1.9], max: [12, 4, 2.2], color: "#3a4250", mat: "metal" },
+  // === Couloir Ouest ===
+  { min: [-12, 0, -2.2], max: [-6, 4, -1.9], color: "#3a4250", mat: "metal" },
+  { min: [-12, 0, 1.9], max: [-6, 4, 2.2], color: "#3a4250", mat: "metal" },
+
+  // === Salle Nord (Extraction, z=-12 à z=-18) ===
+  { min: [-5, 0, -18.2], max: [5, 4, -17.9], color: "#2d5a4a", mat: "panel" }, // fond
+  { min: [-5.2, 0, -18], max: [-4.9, 4, -12], color: "#3a5050", mat: "panel" }, // gauche
+  { min: [4.9, 0, -18], max: [5.2, 4, -12], color: "#3a5050", mat: "panel" }, // droite
+  // === Salle Sud (Armurerie, z=12 à z=18) ===
+  { min: [-5, 0, 17.9], max: [5, 4, 18.2], color: "#5a4a2a", mat: "panel" },
+  { min: [-5.2, 0, 12], max: [-4.9, 4, 18], color: "#504030", mat: "panel" },
+  { min: [4.9, 0, 12], max: [5.2, 4, 18], color: "#504030", mat: "panel" },
+  // === Salle Est (Machine, x=12 à x=18) ===
+  { min: [17.9, 0, -4], max: [18.2, 4, 4], color: "#5a3a2a", mat: "panel" },
+  { min: [12, 0, -4.2], max: [18, 4, -3.9], color: "#503530", mat: "panel" },
+  { min: [12, 0, 3.9], max: [18, 4, 4.2], color: "#503530", mat: "panel" },
+  // === Salle Ouest (Médical, x=-18 à x=-12) ===
+  { min: [-18.2, 0, -4], max: [-17.9, 4, 4], color: "#3a4a5a", mat: "panel" },
+  { min: [-18, 0, -4.2], max: [-12, 4, -3.9], color: "#304050", mat: "panel" },
+  { min: [-18, 0, 3.9], max: [-12, 4, 4.2], color: "#304050", mat: "panel" },
+];
+
+// Piliers porteurs (collision + rendu)
+const LEVEL_PILLARS: Box[] = [
+  // Coins du hub
+  { min: [-6.4, 0, -6.4], max: [-5.6, 4, -5.6], color: "#5a5a55", mat: "concrete" },
+  { min: [5.6, 0, -6.4], max: [6.4, 4, -5.6], color: "#5a5a55", mat: "concrete" },
+  { min: [-6.4, 0, 5.6], max: [-5.6, 4, 6.4], color: "#5a5a55", mat: "concrete" },
+  { min: [5.6, 0, 5.6], max: [6.4, 4, 6.4], color: "#5a5a55", mat: "concrete" },
+  // Coins couloirs (entrée salles)
+  { min: [-2.4, 0, -12.4], max: [-1.6, 4, -11.6], color: "#4a4a45", mat: "concrete" },
+  { min: [1.6, 0, -12.4], max: [2.4, 4, -11.6], color: "#4a4a45", mat: "concrete" },
+  { min: [-2.4, 0, 11.6], max: [-1.6, 4, 12.4], color: "#4a4a45", mat: "concrete" },
+  { min: [1.6, 0, 11.6], max: [2.4, 4, 12.4], color: "#4a4a45", mat: "concrete" },
+];
+
+// Toutes les boîtes solides pour la collision
+const ALL_SOLID: Box[] = [...LEVEL_WALLS, ...LEVEL_PILLARS];
+
+/* Test de collision cercle-AABB : corrige la position si collision */
+function resolveCollision(px: number, pz: number, radius: number): [number, number] {
+  let x = px, z = pz;
+  for (const b of ALL_SOLID) {
+    // Trouve le point le plus proche de (x,z) sur la boîte
+    const cx = Math.max(b.min[0], Math.min(x, b.max[0]));
+    const cz = Math.max(b.min[2], Math.min(z, b.max[2]));
+    const dx = x - cx;
+    const dz = z - cz;
+    const distSq = dx * dx + dz * dz;
+    if (distSq < radius * radius) {
+      const dist = Math.sqrt(distSq);
+      if (dist > 0.001) {
+        // Pousser hors de la boîte
+        const push = radius - dist;
+        x += (dx / dist) * push;
+        z += (dz / dist) * push;
+      } else {
+        // Centre dans la boîte — pousser en X
+        x += radius;
+      }
+    }
+  }
+  return [x, z];
+}
+
+/* ============================================================
+   ShipEnvironment — rendu de la forteresse (matériaux riches)
+   ============================================================ */
 function ShipEnvironment() {
-  // Palette colorée (plus noire)
-  const wallColor = "#3a4a5e";
-  const wallAccent = "#4a5a6e";
-  const floorColor = "#1a2a3e";
-  const floorAccent = "#2a3a4e";
-  const accent = "#1AA1CE";
-  const accent2 = "#00CED1";
-
-  const walls = useMemo(() => {
-    const w: { pos: [number, number, number]; size: [number, number, number] }[] = [];
-    const H = 4;
-    const T = 0.3;
-    // Zone centrale
-    w.push({ pos: [-7, H / 2, -8], size: [4, H, T] });
-    w.push({ pos: [7, H / 2, -8], size: [4, H, T] });
-    w.push({ pos: [-7, H / 2, 8], size: [4, H, T] });
-    w.push({ pos: [7, H / 2, 8], size: [4, H, T] });
-    w.push({ pos: [8, H / 2, -7], size: [T, H, 4] });
-    w.push({ pos: [8, H / 2, 7], size: [T, H, 4] });
-    w.push({ pos: [-8, H / 2, -7], size: [T, H, 4] });
-    w.push({ pos: [-8, H / 2, 7], size: [T, H, 4] });
-    // Corridors
-    w.push({ pos: [-3, H / 2, -14], size: [T, H, 6] });
-    w.push({ pos: [3, H / 2, -14], size: [T, H, 6] });
-    w.push({ pos: [0, H / 2, -20], size: [14, H, T] });
-    w.push({ pos: [-3, H / 2, 14], size: [T, H, 6] });
-    w.push({ pos: [3, H / 2, 14], size: [T, H, 6] });
-    w.push({ pos: [0, H / 2, 20], size: [14, H, T] });
-    w.push({ pos: [14, H / 2, -3], size: [6, H, T] });
-    w.push({ pos: [14, H / 2, 3], size: [6, H, T] });
-    w.push({ pos: [20, H / 2, 0], size: [T, H, 14] });
-    w.push({ pos: [-14, H / 2, -3], size: [6, H, T] });
-    w.push({ pos: [-14, H / 2, 3], size: [6, H, T] });
-    w.push({ pos: [-20, H / 2, 0], size: [T, H, 14] });
-    // Zones secondaires
-    w.push({ pos: [-7, H / 2, -17], size: [T, H, 6] });
-    w.push({ pos: [7, H / 2, -17], size: [T, H, 6] });
-    w.push({ pos: [-7, H / 2, 17], size: [T, H, 6] });
-    w.push({ pos: [7, H / 2, 17], size: [T, H, 6] });
-    w.push({ pos: [17, H / 2, -7], size: [6, H, T] });
-    w.push({ pos: [17, H / 2, 7], size: [6, H, T] });
-    w.push({ pos: [-17, H / 2, -7], size: [6, H, T] });
-    w.push({ pos: [-17, H / 2, 7], size: [6, H, T] });
-    return w;
-  }, []);
-
-  const crates = useMemo(() => [
-    { pos: [-4, 0.6, -3], size: [1.5, 1.2, 1.5] },
-    { pos: [4, 0.6, 3], size: [1.5, 1.2, 1.5] },
-    { pos: [-4, 0.6, 5], size: [1.5, 1.2, 1.5] },
-    { pos: [4, 0.6, -5], size: [1.5, 1.2, 1.5] },
-    { pos: [0, 0.5, -16], size: [3, 1, 1] },
-    { pos: [-5, 0.6, -18], size: [1.5, 1.2, 1.5] },
-    { pos: [5, 0.6, -18], size: [1.5, 1.2, 1.5] },
-    { pos: [0, 0.5, 16], size: [3, 1, 1] },
-    { pos: [16, 0.5, 0], size: [1, 1, 3] },
-    { pos: [-16, 0.5, 0], size: [1, 1, 3] },
-  ], []);
+  const matProps: Record<string, { metalness: number; roughness: number }> = {
+    steel: { metalness: 0.85, roughness: 0.3 },
+    concrete: { metalness: 0.1, roughness: 0.9 },
+    panel: { metalness: 0.4, roughness: 0.6 },
+    metal: { metalness: 0.7, roughness: 0.5 },
+  };
 
   return (
     <group>
-      {/* Sol avec couleur visible + motifs */}
+      {/* === SOL : plaques métalliques par zone avec couleurs distinctes === */}
+      {/* Hub central — plaques d'acier */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+        <planeGeometry args={[12, 12]} />
+        <meshStandardMaterial color="#3a4250" metalness={0.7} roughness={0.4} />
+      </mesh>
+      {/* Couloirs — grissage sombre */}
       {[
-        { pos: [0, 0, 0], size: [16, 16], color: floorColor },
-        { pos: [0, 0, -17], size: [14, 6], color: floorAccent },
-        { pos: [0, 0, 17], size: [14, 6], color: floorAccent },
-        { pos: [17, 0, 0], size: [6, 14], color: floorAccent },
-        { pos: [-17, 0, 0], size: [6, 14], color: floorAccent },
+        { pos: [0, 0, -9] as [number, number, number], size: [4, 6] },
+        { pos: [0, 0, 9] as [number, number, number], size: [4, 6] },
+        { pos: [9, 0, 0] as [number, number, number], size: [6, 4] },
+        { pos: [-9, 0, 0] as [number, number, number], size: [6, 4] },
       ].map((f, i) => (
-        <mesh key={`floor-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={f.pos as [number, number, number]} receiveShadow>
+        <mesh key={`corr-floor-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={f.pos}>
           <planeGeometry args={f.size} />
-          <meshStandardMaterial color={f.color} metalness={0.6} roughness={0.5} />
+          <meshStandardMaterial color="#2a3040" metalness={0.6} roughness={0.6} />
         </mesh>
       ))}
+      {/* Salles — sols colorés par fonction */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -15]}><planeGeometry args={[10, 6]} /><meshStandardMaterial color="#2d4a3a" metalness={0.4} roughness={0.7} /></mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 15]}><planeGeometry args={[10, 6]} /><meshStandardMaterial color="#4a3a2a" metalness={0.4} roughness={0.7} /></mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[15, 0, 0]}><planeGeometry args={[6, 8]} /><meshStandardMaterial color="#4a2a2a" metalness={0.4} roughness={0.7} /></mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-15, 0, 0]}><planeGeometry args={[6, 8]} /><meshStandardMaterial color="#2a3a4a" metalness={0.4} roughness={0.7} /></mesh>
 
-      {/* Lignes de sol cyan (motifs visibles) */}
-      {[-7, 0, 7].map((z, i) => (
-        <mesh key={`fl-${i}`} position={[0, 0.02, z]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[16, 0.12]} />
-          <meshBasicMaterial color={accent2} toneMapped={false} opacity={0.6} transparent />
-        </mesh>
-      ))}
-      {[-7, 0, 7].map((x, i) => (
-        <mesh key={`fvl-${i}`} position={[x, 0.02, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-          <planeGeometry args={[16, 0.12]} />
-          <meshBasicMaterial color={accent2} toneMapped={false} opacity={0.6} transparent />
-        </mesh>
-      ))}
-
-      {/* Plafond */}
-      {[
-        { pos: [0, 4, 0], size: [16, 16] },
-        { pos: [0, 4, -17], size: [14, 6] },
-        { pos: [0, 4, 17], size: [14, 6] },
-        { pos: [17, 4, 0], size: [6, 14] },
-        { pos: [-17, 4, 0], size: [6, 14] },
-      ].map((f, i) => (
-        <mesh key={`ceil-${i}`} rotation={[Math.PI / 2, 0, 0]} position={f.pos as [number, number, number]} receiveShadow>
-          <planeGeometry args={f.size} />
-          <meshStandardMaterial color="#152535" metalness={0.4} roughness={0.7} />
-        </mesh>
-      ))}
-
-      {/* Murs colorés (bleu-gris visible) */}
-      {walls.map((w, i) => (
-        <mesh key={`wall-${i}`} position={w.pos} castShadow receiveShadow>
-          <boxGeometry args={w.size} />
-          <meshStandardMaterial color={wallColor} metalness={0.5} roughness={0.6} />
-        </mesh>
-      ))}
-
-      {/* Bandes lumineuses sur murs (glow cyan) */}
-      {walls.slice(0, 8).map((w, i) => (
-        <mesh key={`wglow-${i}`} position={[w.pos[0], 3.2, w.pos[2]]}>
-          <boxGeometry args={[w.size[0] * 0.8, 0.15, w.size[2] * 0.8]} />
-          <meshBasicMaterial color={accent} toneMapped={false} opacity={0.7} transparent />
-        </mesh>
-      ))}
-
-      {/* Caisses couverture colorées */}
-      {crates.map((c, i) => (
-        <mesh key={`crate-${i}`} position={c.pos as [number, number, number]} castShadow>
-          <boxGeometry args={c.size as [number, number, number]} />
-          <meshStandardMaterial color="#3a4a5e" metalness={0.5} roughness={0.6} />
-        </mesh>
-      ))}
-
-      {/* Portes encadrées (4 portes cardinales) avec glow */}
-      {[
-        { pos: [0, 2, -8] as [number, number, number], rot: 0 },
-        { pos: [0, 2, 8] as [number, number, number], rot: Math.PI },
-        { pos: [8, 2, 0] as [number, number, number], rot: -Math.PI / 2 },
-        { pos: [-8, 2, 0] as [number, number, number], rot: Math.PI / 2 },
-      ].map((d, i) => (
-        <group key={`door-${i}`} position={d.pos} rotation={[0, d.rot, 0]}>
-          {/* Cadre haut */}
-          <mesh position={[0, 1.8, 0]}>
-            <boxGeometry args={[3.2, 0.15, 0.1]} />
-            <meshBasicMaterial color={accent} toneMapped={false} />
-          </mesh>
-          {/* Cadre gauche */}
-          <mesh position={[-1.6, 0, 0]}>
-            <boxGeometry args={[0.15, 3.6, 0.1]} />
-            <meshBasicMaterial color={accent} toneMapped={false} opacity={0.6} transparent />
-          </mesh>
-          {/* Cadre droit */}
-          <mesh position={[1.6, 0, 0]}>
-            <boxGeometry args={[0.15, 3.6, 0.1]} />
-            <meshBasicMaterial color={accent} toneMapped={false} opacity={0.6} transparent />
-          </mesh>
+      {/* Lignes de sol cyan au hub */}
+      {[-4, 0, 4].map((v, i) => (
+        <group key={`grid-${i}`}>
+          <mesh position={[0, 0.02, v]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[12, 0.08]} /><meshBasicMaterial color="#4fc8e8" toneMapped={false} opacity={0.5} transparent /></mesh>
+          <mesh position={[v, 0.02, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}><planeGeometry args={[12, 0.08]} /><meshBasicMaterial color="#4fc8e8" toneMapped={false} opacity={0.5} transparent /></mesh>
         </group>
       ))}
 
-      {/* Porte d'extraction (zone nord fond) - verte voyante */}
-      <group position={[0, 2, -19.85]}>
-        <mesh>
-          <planeGeometry args={[4, 3.6]} />
-          <meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.35} transparent />
-        </mesh>
-        <mesh position={[-2, 0, 0.1]}><boxGeometry args={[0.15, 3.8, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
-        <mesh position={[2, 0, 0.1]}><boxGeometry args={[0.15, 3.8, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
-        <mesh position={[0, 1.9, 0.1]}><boxGeometry args={[4.15, 0.15, 0.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
-      </group>
+      {/* Emblème central au sol */}
+      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.5, 1.8, 8]} />
+        <meshBasicMaterial color="#1AA1CE" toneMapped={false} opacity={0.6} transparent />
+      </mesh>
 
-      {/* Écrans muraux (décorations colorées) */}
+      {/* === PLAFOND avec poutres === */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 4, 0]}><planeGeometry args={[12, 12]} /><meshStandardMaterial color="#2a2a30" metalness={0.3} roughness={0.8} /></mesh>
+      {/* Poutres de plafond (structure) */}
+      {[-4, 0, 4].map((v, i) => (
+        <group key={`beam-${i}`}>
+          <mesh position={[0, 3.9, v]}><boxGeometry args={[12, 0.2, 0.15]} /><meshStandardMaterial color="#3a3a40" metalness={0.5} roughness={0.6} /></mesh>
+          <mesh position={[v, 3.9, 0]}><boxGeometry args={[0.15, 0.2, 12]} /><meshStandardMaterial color="#3a3a40" metalness={0.5} roughness={0.6} /></mesh>
+        </group>
+      ))}
+
+      {/* === MURS avec matériaux riches === */}
+      {LEVEL_WALLS.map((w, i) => {
+        const sx = w.max[0] - w.min[0];
+        const sy = w.max[1] - w.min[1];
+        const sz = w.max[2] - w.min[2];
+        const cx = (w.min[0] + w.max[0]) / 2;
+        const cy = (w.min[1] + w.max[1]) / 2;
+        const cz = (w.min[2] + w.max[2]) / 2;
+        const mp = matProps[w.mat];
+        return (
+          <mesh key={`wall-${i}`} position={[cx, cy, cz]} castShadow receiveShadow>
+            <boxGeometry args={[sx, sy, sz]} />
+            <meshStandardMaterial color={w.color} metalness={mp.metalness} roughness={mp.roughness} />
+          </mesh>
+        );
+      })}
+
+      {/* === PILIERS porteurs (béton) avec capuchons acier === */}
+      {LEVEL_PILLARS.map((p, i) => {
+        const sx = p.max[0] - p.min[0];
+        const sz = p.max[2] - p.min[2];
+        const cx = (p.min[0] + p.max[0]) / 2;
+        const cz = (p.min[2] + p.max[2]) / 2;
+        const mp = matProps[p.mat];
+        return (
+          <group key={`pillar-${i}`} position={[cx, 2, cz]}>
+            <mesh castShadow>
+              <boxGeometry args={[sx, 4, sz]} />
+              <meshStandardMaterial color={p.color} metalness={mp.metalness} roughness={mp.roughness} />
+            </mesh>
+            {/* Capuchon acier en haut */}
+            <mesh position={[0, 2, 0]}>
+              <boxGeometry args={[sx + 0.1, 0.15, sz + 0.1]} />
+              <meshStandardMaterial color="#4a5560" metalness={0.8} roughness={0.3} />
+            </mesh>
+            {/* Bande lumineuse sur pilier */}
+            <mesh position={[0, 1, sz / 2 + 0.01]}>
+              <planeGeometry args={[sx * 0.6, 0.4]} />
+              <meshBasicMaterial color="#4fc8e8" toneMapped={false} opacity={0.5} transparent />
+            </mesh>
+          </group>
+        );
+      })}
+
+      {/* === BANDES LUMINEUSES murales (glow chaud/froid) === */}
       {[
-        { pos: [-7.8, 2, 0], rot: [0, Math.PI / 2, 0], color: "#1AA1CE" },
-        { pos: [7.8, 2, 0], rot: [0, -Math.PI / 2, 0], color: "#00CED1" },
-        { pos: [0, 2, -7.8], rot: [0, 0, 0], color: "#A855F7" },
-        { pos: [0, 2, 7.8], rot: [0, Math.PI, 0], color: "#FFE735" },
+        { pos: [0, 3.3, -5.85], size: [4, 0.1], color: "#4fc8e8" },
+        { pos: [0, 3.3, 5.85], size: [4, 0.1], color: "#4fc8e8" },
+        { pos: [5.85, 3.3, 0], size: [0.1, 4], color: "#f0a030" },
+        { pos: [-5.85, 3.3, 0], size: [0.1, 4], color: "#f0a030" },
+      ].map((g, i) => (
+        <mesh key={`strip-${i}`} position={g.pos as [number, number, number]}>
+          <boxGeometry args={g.size as [number, number, number]} />
+          <meshBasicMaterial color={g.color} toneMapped={false} opacity={0.7} transparent />
+        </mesh>
+      ))}
+
+      {/* === TUYAUX le long des murs (immersion industrielle) === */}
+      {/* Tuyaux horizontaux cuivre — hub */}
+      <mesh position={[-5.7, 2.5, 0]}><cylinderGeometry args={[0.08, 0.08, 10, 6]} rotation={[Math.PI / 2, 0, 0]} /><meshStandardMaterial color="#8a5a3a" metalness={0.7} roughness={0.4} /></mesh>
+      <mesh position={[5.7, 2.5, 0]}><cylinderGeometry args={[0.08, 0.08, 10, 6]} rotation={[Math.PI / 2, 0, 0]} /><meshStandardMaterial color="#8a5a3a" metalness={0.7} roughness={0.4} /></mesh>
+      <mesh position={[0, 2.5, -5.7]}><cylinderGeometry args={[0.08, 0.08, 10, 6]} rotation={[0, 0, Math.PI / 2]} /><meshStandardMaterial color="#6a7080" metalness={0.7} roughness={0.4} /></mesh>
+      <mesh position={[0, 2.5, 5.7]}><cylinderGeometry args={[0.08, 0.08, 10, 6]} rotation={[0, 0, Math.PI / 2]} /><meshStandardMaterial color="#6a7080" metalness={0.7} roughness={0.4} /></mesh>
+
+      {/* === PORTES encadrées (4 entrées du hub) === */}
+      {[
+        { pos: [0, 0, -6] as [number, number, number], rot: 0 },
+        { pos: [0, 0, 6] as [number, number, number], rot: Math.PI },
+        { pos: [6, 0, 0] as [number, number, number], rot: -Math.PI / 2 },
+        { pos: [-6, 0, 0] as [number, number, number], rot: Math.PI / 2 },
+      ].map((d, i) => (
+        <group key={`door-${i}`} position={d.pos} rotation={[0, d.rot, 0]}>
+          <mesh position={[0, 3.8, 0]}><boxGeometry args={[3.4, 0.2, 0.15]} /><meshStandardMaterial color="#3a3a40" metalness={0.7} roughness={0.4} /></mesh>
+          <mesh position={[-1.7, 1.8, 0]}><boxGeometry args={[0.15, 3.8, 0.1]} /><meshBasicMaterial color="#4fc8e8" toneMapped={false} opacity={0.6} transparent /></mesh>
+          <mesh position={[1.7, 1.8, 0]}><boxGeometry args={[0.15, 3.8, 0.1]} /><meshBasicMaterial color="#4fc8e8" toneMapped={false} opacity={0.6} transparent /></mesh>
+        </group>
+      ))}
+
+      {/* === PROPS par salle (immersion) === */}
+      {/* Salle Nord : extraction — panneau vert + caisses */}
+      <mesh position={[0, 1.8, -17.9]}><planeGeometry args={[4, 3.2]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} opacity={0.3} transparent /></mesh>
+      <mesh position={[0, 2, -18.1]}><boxGeometry args={[4.2, 0.15, 0.1]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
+      <mesh position={[-2, 2, -18.1]}><boxGeometry args={[0.15, 4, 0.1]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
+      <mesh position={[2, 2, -18.1]}><boxGeometry args={[0.15, 4, 0.1]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
+
+      {/* Salle Sud : armurerie — râteliers d'armes */}
+      {[-3, 0, 3].map((x, i) => (
+        <mesh key={`rack-${i}`} position={[x, 1, 17.8]}><boxGeometry args={[1.5, 2, 0.3]} /><meshStandardMaterial color="#3a3a30" metalness={0.6} roughness={0.5} /></mesh>
+      ))}
+
+      {/* Salle Est : machine — générateurs */}
+      <mesh position={[17.8, 1, -2]}><boxGeometry args={[0.5, 2, 1.5]} /><meshStandardMaterial color="#5a3a2a" metalness={0.5} roughness={0.6} /></mesh>
+      <mesh position={[17.8, 1, 2]}><boxGeometry args={[0.5, 2, 1.5]} /><meshStandardMaterial color="#5a3a2a" metalness={0.5} roughness={0.6} /></mesh>
+      <mesh position={[17.8, 2.2, 0]}><boxGeometry args={[0.3, 0.4, 0.3]} /><meshBasicMaterial color="#f0a030" toneMapped={false} /></mesh>
+
+      {/* Salle Ouest : médical — lits/stations */}
+      <mesh position={[-17.8, 0.5, -2]}><boxGeometry args={[0.5, 1, 1.5]} /><meshStandardMaterial color="#3a5060" metalness={0.4} roughness={0.6} /></mesh>
+      <mesh position={[-17.8, 0.5, 2]}><boxGeometry args={[0.5, 1, 1.5]} /><meshStandardMaterial color="#3a5060" metalness={0.4} roughness={0.6} /></mesh>
+      <mesh position={[-17.8, 1.2, 0]}><boxGeometry args={[0.3, 0.3, 0.3]} /><meshBasicMaterial color="#6CF42E" toneMapped={false} /></mesh>
+
+      {/* Caisses de couverture dans le hub */}
+      {[
+        { pos: [-4, 0.6, -4], size: [1.2, 1.2, 1.2] },
+        { pos: [4, 0.6, 4], size: [1.2, 1.2, 1.2] },
+        { pos: [-4, 0.6, 4], size: [1.2, 1.2, 1.2] },
+        { pos: [4, 0.6, -4], size: [1.2, 1.2, 1.2] },
+      ].map((c, i) => (
+        <mesh key={`crate-${i}`} position={c.pos as [number, number, number]} castShadow>
+          <boxGeometry args={c.size as [number, number, number]} />
+          <meshStandardMaterial color="#3a4550" metalness={0.5} roughness={0.7} />
+        </mesh>
+      ))}
+
+      {/* Écrans muraux colorés (ambiance) */}
+      {[
+        { pos: [-5.6, 2.2, -3], rot: [0, Math.PI / 2, 0], color: "#1AA1CE" },
+        { pos: [5.6, 2.2, 3], rot: [0, -Math.PI / 2, 0], color: "#A855F7" },
+        { pos: [3, 2.2, -5.6], rot: [0, 0, 0], color: "#FFE735" },
+        { pos: [-3, 2.2, 5.6], rot: [0, Math.PI, 0], color: "#6CF42E" },
       ].map((s, i) => (
         <mesh key={`screen-${i}`} position={s.pos as [number, number, number]} rotation={s.rot as [number, number, number]}>
-          <planeGeometry args={[1.5, 1]} />
-          <meshBasicMaterial color={s.color} toneMapped={false} opacity={0.4} transparent />
+          <planeGeometry args={[1.2, 0.8]} />
+          <meshBasicMaterial color={s.color} toneMapped={false} opacity={0.35} transparent />
         </mesh>
       ))}
     </group>
@@ -301,6 +406,10 @@ function EnemyEntity({
     // Limites
     instance.position.x = Math.max(-19, Math.min(19, instance.position.x));
     instance.position.z = Math.max(-19, Math.min(19, instance.position.z));
+    // Collision ennemi-murs
+    const [ex, ez] = resolveCollision(instance.position.x, instance.position.z, 0.35);
+    instance.position.x = ex;
+    instance.position.z = ez;
 
     ref.current.position.copy(instance.position);
     ref.current.lookAt(playerP.x, instance.position.y, playerP.z);
@@ -688,11 +797,13 @@ function Player({
     if (r.move.x > 0) move.add(right);
     if (move.lengthSq() > 0) move.normalize().multiplyScalar(speed * delta);
 
-    // Collision simple : limites + éviter murs centraux (approx)
-    const newX = Math.max(-19, Math.min(19, camera.position.x + move.x));
-    const newZ = Math.max(-19, Math.min(19, camera.position.z + move.z));
-    camera.position.x = newX;
-    camera.position.z = newZ;
+    // Collision : limites du niveau + murs solides (AABB)
+    const boundX = Math.max(-19, Math.min(19, camera.position.x + move.x));
+    const boundZ = Math.max(-19, Math.min(19, camera.position.z + move.z));
+    // Résolution collision cercle-AABB contre tous les murs/piliers (rayon 0.4)
+    const [colX, colZ] = resolveCollision(boundX, boundZ, 0.4);
+    camera.position.x = colX;
+    camera.position.z = colZ;
 
     // Saut + gravité
     if (r.jump && camera.position.y <= 1.6) {
@@ -816,11 +927,11 @@ export function FPSGame({ onExit }: { onExit: () => void }) {
   const enemies = useRef<EnemyInstance[]>([]);
   const [, forceUpdate] = useState(0);
 
-  // Rafraîchit le HUD toutes les 100ms pour la minimap en temps réel
+  // Rafraîchit le HUD toutes les 250ms pour la minimap (pas trop fréquent pour perf)
   useEffect(() => {
     const interval = setInterval(() => {
       forceUpdate(n => n + 1);
-    }, 100);
+    }, 250);
     return () => clearInterval(interval);
   }, []);
   const enemyIdCounter = useRef(0);
